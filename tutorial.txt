@@ -1,0 +1,44 @@
+🐪 Kazdy komentar zacina znakem velblouda (U+1F42A) a konci znakem pouste (U+1F3DC), jakekoliv bile znaky ignorujte 🏜
+🐪 Pocet skladu S: 🏜
+1
+🐪 Definice skladu (souradnice x,y, pocet kosu ks, doba doplneni ts a doba nalozeni tn) 🏜
+10 10 3 1000 1
+🐪 Pocet oaz O: 🏜
+8
+🐪 Definice oaz (souradnice x,y) 🏜
+0 0
+0 10
+0 20
+10 0
+10 20
+20 0
+20 10
+20 20
+🐪 Pocet cest C: 🏜
+8
+🐪 Definice cest (jedineho skladu do kazde z oaz) 🏜
+1 2
+1 3
+1 4
+1 5
+1 6
+1 7
+1 8
+1 9
+🐪 Pocet druhu velbloudu D: 🏜
+2
+🐪 Definice velblouda (nazev, minimalni rychlost, maximalni rychlost, minimalni vzdalenost, maximalni vzdalenost, doba piti, maximalni zatizeni a procentualni pomer druhu velblouda)  🏜
+Pomaly 1 1 1000 1000 0 1 0.5
+Ziznivy 10 10 1 1 10 1 0.5
+🐪 Pocet pozadavku P: 🏜
+8
+🐪 Definice pozadavku (kazda oaza chce jeden kos, moc na to nespechaji) 🏜
+0 1 1 10000
+0 2 1 10000
+0 3 1 10000
+0 4 1 10000
+0 5 1 10000
+0 6 1 10000
+0 7 1 10000
+0 8 1 10000
+

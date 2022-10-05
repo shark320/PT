@@ -1,0 +1,41 @@
+🐪 Kazdy komentar zacina znakem velblouda
+(U+1F42A) a konci znakem pouste (U+1F3DC), jakekoliv bile znaky ignorujte 🏜
+🐪 Tyto cisla ignorujte: 10000000 9805216 🏜 1
+🐪 Vnorene komentare: 🐪 proc ne ;) 🏜🏜
+10 10 3	1000		1 🐪 Komentar na konci radku 🏜
+8 🐪 Komentar uprostred radku a jeste s ciselnou hodnotou 69 🏜     0 0
+0 10
+0 20 10 0 10
+20
+20 0
+20 10
+20 20
+🐪 Blokovy komentar?
+Ten je fajn ne?
+Nejlepsi jeste je kdyz tam bude nejaka hodnota, treba:
+53
+Takovy komentar se mi libi 🏜
+8
+🐪 Prazdny komentar nasleduje:🏜🐪🏜
+🐪 sit amet🐪🐪🐪ipsum 🐪lorem🏜 lorem ipsum 🏜 ipsum🏜 dolor🏜🏜
+1    2    1 3
+1   4 🐪 Nezalomitelna mezera je take bily znak ;) 🏜
+1 5 	 		1 6
+
+
+
+1        	 7 1
+
+8
+1 9
+2
+18_$@#\/&!***_34  🐪 Takove nazvy druhu velbloudu? No samozrejme, pouze bile znaky tam nesmi byt 🏜 1 1 1000 1000 0 1 0.5
+¯\_(ツ)_/¯ 10 10 1 1 10 1 0.5
+8
+0 1 1 10000
+0 2 1 10000
+0	3 1 10000 0 4
+1 10000
+0 5 1	10000
+0 6	1 10000 0 7 1
+10000🐪Komentar bez mezer pred a za🏜0 8 1 10000

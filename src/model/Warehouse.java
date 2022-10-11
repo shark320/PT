@@ -1,16 +1,10 @@
 package model;
 
+import helpers.Point;
+
 public class Warehouse {
 
-    /**
-     * X-coordinate of the warehouse
-     */
-    private final int x;
-
-    /**
-     * Y-coordinate of the warehouse
-     */
-    private final int y;
+    private final Point location;
 
     /**
      * Current amount of goods
@@ -38,20 +32,15 @@ public class Warehouse {
     private final int previousSupply = 0;
 
     public Warehouse(int x, int y, int supplyAmount, int supplyTimeout, int loadingTime) {
-        this.x = x;
-        this.y = y;
+        this.location = new Point(x, y);
         this.supplyAmount = supplyAmount;
         this.supplyTimeout = supplyTimeout;
         this.loadingTime = loadingTime;
         this.goodsAmount = supplyAmount;
     }
 
-    public int getX() {
-        return x;
-    }
-
-    public int getY() {
-        return y;
+    public Point getLocation() {
+        return location;
     }
 
     public int getGoodsAmount() {
@@ -80,8 +69,8 @@ public class Warehouse {
 
     @Override
     public String toString() {
-        return "<WAREHOUSE>[x=" + this.x
-                + ", y=" + this.y
+        return "<WAREHOUSE>[x=" + this.location.getX()
+                + ", y=" + this.location.getY()
                 + ", ks=" + this.supplyAmount
                 + ", ts=" + this.supplyTimeout
                 + ", tn=" + this.loadingTime

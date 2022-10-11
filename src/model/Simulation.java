@@ -1,8 +1,9 @@
 package model;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import helpers.AStartEntity;
+import helpers.Point;
+
+import java.util.*;
 
 public class Simulation {
 
@@ -12,6 +13,7 @@ public class Simulation {
 
     private final List<Camel> camels = new LinkedList<>();
 
+    private final List<Point> points = new ArrayList<>();
     private final List<Request> requests = new LinkedList<>();
 
     /**
@@ -32,6 +34,7 @@ public class Simulation {
                     Integer.parseInt(params[i++]),
                     Integer.parseInt(params[i++])
             );
+            points.add(w.getLocation());
             warehouses.add(w);
         }
         int oasesCount = Integer.parseInt(params[i++]);
@@ -40,6 +43,7 @@ public class Simulation {
                     Integer.parseInt(params[i++]),
                     Integer.parseInt(params[i++])
             );
+            points.add(o.getLocation());
             oases.add(o);
         }
         roads = new boolean[warehouseCount+oasesCount][oasesCount+warehouseCount];
@@ -75,6 +79,69 @@ public class Simulation {
             requests.add(r);
         }
     }
+
+    private int heuristic(Point first, Point second){
+        if(first==null || second==null){
+            throw new NullPointerException("two points must not be null");
+        }
+        return Math.abs(first.getX()- second.getX()) + Math.abs(first.getY()- second.getY());
+    }
+
+    private List<Point> getNeighbours(Point p){
+        int id = points.indexOf(p);
+        ArrayList<Point> neighbours = new ArrayList<Point>(roads[id].length);
+        for (int i = 0; i < roads[id].length; i++) {
+            if (roads[id][i]){
+                neighbours.add(points.get(i));
+            }
+        }
+
+        return neighbours;
+    }
+
+    public void showPath(int i, int j){
+        Point start = points.get(i);
+        Point end = points.get(j);
+        System.out.println(findPath(start, end));
+    }
+
+
+    private LinkedHashSet<Point> findPath(Point start, Point end){
+        PriorityQueue<AStartEntity> queue = new PriorityQueue<>();
+        queue.add(new AStartEntity(start, 0));
+        LinkedHashSet<Point> path = new LinkedHashSet<>();
+        Map<Point,Point> previous = new HashMap<>();
+        previous.put(start, null);
+
+        while (!queue.isEmpty()){
+            Point current = queue.poll().point;
+
+            if (current.isEqual(end)){
+                break;
+            }
+
+            for (Point next : getNeighbours(current)){
+                if (!previous.containsKey(next)){
+                    int priority = heuristic(end,next);
+                    queue.add(new AStartEntity(next,priority));
+                    previous.put(next, current);
+                }
+            }
+
+        }
+
+        if (previous.containsKey(end)){
+
+            Point p = end;
+            path.add(p);
+            while((p = previous.get(p))!=null){
+                path.add(p);
+            }
+        }
+
+        return path;
+    }
+
 
     @Override
     public String toString() {

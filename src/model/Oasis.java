@@ -1,26 +1,21 @@
 package model;
 
+import helpers.Point;
+
 public class Oasis {
 
-    private final int x;
-
-    private final int y;
+    private final Point location;
 
     public Oasis(int x, int y) {
-        this.x = x;
-        this.y = y;
+        location = new Point(x, y);
     }
 
-    public int getX() {
-        return x;
-    }
-
-    public int getY() {
-        return y;
+    public Point getLocation(){
+        return location;
     }
 
     @Override
     public String toString() {
-        return "<OASIS>[x="+this.x+", y="+this.y+"]";
+        return "<OASIS>[x="+this.location.getX()+", y="+this.location.getY()+"]";
     }
 }

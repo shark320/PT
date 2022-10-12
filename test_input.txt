@@ -1,1 +1,91 @@
-1🐪 Definice skladu (souradnice x,y, pocet kosu ks, doba doplneni ts a doba nalozeni tn) 🏜
+🐪 Kazdy komentar zacina znakem velblouda (U+1F42A) a konci znakem pouste (U+1F3DC), jakekoliv bile znaky ignorujte 🏜
+🐪 Pocet skladu S: 🏜
+0
+🐪 Pocet oaz O: 🏜
+30
+🐪 Definice oaz (souradnice x,y) 🏜
+0 0
+0 5
+0 10
+0 15
+0 20
+5 0
+5 5
+5 10
+5 15
+5 20
+10 0
+10 5
+10 10
+10 15
+10 20
+15 0
+15 5
+15 10
+15 15
+15 20
+20 0
+20 5
+20 10
+20 15
+20 20
+25 0
+25 5
+25 10
+25 15
+25 20
+🐪 Pocet cest C: 🏜
+35
+🐪 Definice cest (jedineho skladu do kazde z oaz) 🏜
+1 2
+2 3
+3 4
+4 5
+5 10
+10 15
+15 20
+20 25
+4 9
+9 10
+9 14
+14 15
+14 19
+3 9
+1 7
+7 8
+8 13
+13 19
+19 24
+24 29
+29 30
+13 18
+18 23
+23 28
+28 27
+27 26
+26 22
+22 17
+17 13
+1 6
+6 11
+11 16
+16 21
+21 26
+24 25
+🐪 Pocet druhu velbloudu D: 🏜
+2
+🐪 Definice velblouda (nazev, minimalni rychlost, maximalni rychlost, minimalni vzdalenost, maximalni vzdalenost, doba piti, maximalni zatizeni a procentualni pomer druhu velblouda)  🏜
+Pomaly 1 1 1000 1000 0 1 0.5
+Ziznivy 10 10 1 1 10 1 0.5
+🐪 Pocet pozadavku P: 🏜
+8
+🐪 Definice pozadavku (kazda oaza chce jeden kos, moc na to nespechaji) 🏜
+0 1 1 10000
+0 2 1 10000
+0 3 1 10000
+0 4 1 10000
+0 5 1 10000
+0 6 1 10000
+0 7 1 10000
+0 8 1 10000
+

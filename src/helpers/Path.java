@@ -2,6 +2,7 @@ package helpers;
 
 import java.util.*;
 
+
 public class Path {
 
     Set<Integer> indexes = new LinkedHashSet<>();
@@ -16,8 +17,6 @@ public class Path {
     public Set<Integer> getPath(){
         return indexes;
     }
-
-
 
     @Override
     public String toString() {

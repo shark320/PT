@@ -2,13 +2,19 @@ import java.io.*;
 import java.util.Deque;
 import java.util.LinkedList;
 
-public class Parser {
+/**
+ * Abstract file parser class
+ *
+ * @author vpavlov
+ */
+public abstract class Parser {
 
-//    private class Comment{
-//        private int start;
-//        private int end;
-//    }
-
+    /**
+     * Reading the file
+     *
+     * @param file -file to read
+     * @return file content
+     */
     private static String getData(File file) {
         StringBuilder out = new StringBuilder();
         try (BufferedReader input = new BufferedReader(new InputStreamReader(new FileInputStream(file)))) {
@@ -22,9 +28,14 @@ public class Parser {
         return out.toString();
     }
 
-
+    /**
+     * Parsing the file
+     *
+     * @param file - file to parse
+     * @return array of values from file without comments and white symbols
+     */
     public static String[] parseFile(File file) {
-        StringBuilder str = new StringBuilder( getData(file));
+        StringBuilder str = new StringBuilder(getData(file));
         Deque<Integer> commentsStarts = new LinkedList<>();
         int i = 0;
         while (i < str.length()) {

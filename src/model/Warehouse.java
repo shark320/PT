@@ -2,35 +2,52 @@ package model;
 
 import helpers.Point;
 
+/**
+ * Class represents warehouse
+ *
+ * @author vpavlov
+ */
 public class Warehouse {
 
+    /**
+     * Location of the warehouse {x , y}
+     */
     private final Point location;
 
     /**
-     * Current amount of goods
+     * Current amount of goods {tc}
      */
     private int goodsAmount;
 
     /**
-     * Amount of goods in one supply
+     * Amount of goods in one supply {ks}
      */
     private final int supplyAmount;
 
     /**
-     * Timeout of supply
+     * Timeout of supply {ts}
      */
     private final int supplyTimeout;
 
     /**
-     * Time is needed for load one good
+     * Time is needed for load one good {tn}
      */
     private final int loadingTime;
 
     /**
-     * Previous supply time (first supply at the beginning of a simulation)
+     * Previous supply time (first supply at the beginning of a simulation) {ps}
      */
     private final int previousSupply = 0;
 
+    /**
+     * Constructor
+     *
+     * @param x             - X-coordinate
+     * @param y             - Y-coordinate
+     * @param supplyAmount  - supply amount
+     * @param supplyTimeout - supply timeout
+     * @param loadingTime   - loading time
+     */
     public Warehouse(int x, int y, int supplyAmount, int supplyTimeout, int loadingTime) {
         this.location = new Point(x, y);
         this.supplyAmount = supplyAmount;
@@ -39,32 +56,22 @@ public class Warehouse {
         this.goodsAmount = supplyAmount;
     }
 
+    /**
+     * Location getter
+     *
+     * @return warehouse location
+     */
     public Point getLocation() {
         return location;
     }
 
+    /**
+     * Goods amount getter
+     *
+     * @return current goods amount
+     */
     public int getGoodsAmount() {
         return goodsAmount;
-    }
-
-    public void setGoodsAmount(int goodsAmount) {
-        this.goodsAmount = goodsAmount;
-    }
-
-    public int getSupplyAmount() {
-        return supplyAmount;
-    }
-
-    public int getSupplyTimeout() {
-        return supplyTimeout;
-    }
-
-    public int getLoadingTime() {
-        return loadingTime;
-    }
-
-    public int getPreviousSupply() {
-        return previousSupply;
     }
 
     @Override
@@ -76,6 +83,6 @@ public class Warehouse {
                 + ", tn=" + this.loadingTime
                 + ", tc=" + this.goodsAmount
                 + ", ps=" + this.previousSupply
-                +"]";
+                + "]";
     }
 }

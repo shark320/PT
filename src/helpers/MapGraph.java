@@ -6,7 +6,7 @@ public class MapGraph {
 
     private final List<GraphEntity> graph;
 
-    private final Map<Integer,Path> paths = new HashMap<>();
+    private final Map<Integer,List<Path>> paths = new HashMap<>();
 
     public MapGraph(List<Point> points) {
         graph = new ArrayList<>(points.size());
@@ -93,13 +93,25 @@ public class MapGraph {
             for (int j=0;j<warehouseCount; ++j) {
                 List<Point> path = findPath(i,j);
                 if (path != null) {
-                    paths.put(i, new Path(path, i, j));
+                    List<Path> pathList = paths.get(i);
+                    if (pathList == null) {
+                        pathList = new ArrayList<>();
+                        pathList.add(new Path(path,i,j));
+                        paths.put(i, pathList);
+                    }else{
+                        pathList.add(new Path(path,i,j));
+                    }
+
                 }
             }
         }
     }
 
-    public Collection<Path> getPaths() {
+    public List<Path> getPathsForOasis(int oasisId){
+        return paths.get(oasisId);
+    }
+
+    public Collection<List<Path>> getPaths() {
         return paths.values();
     }
 }

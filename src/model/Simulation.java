@@ -130,8 +130,10 @@ public class Simulation {
     }
 
     public void showPaths(){
-        for (Path p : map.getPaths()){
-            System.out.println(p);
+        for (List<Path> pathList : map.getPaths()){
+            for (Path p:pathList) {
+                System.out.println(p);
+            }
         }
     }
 

@@ -2,12 +2,28 @@ package helpers;
 
 import java.util.*;
 
+/**
+ * Simulation map represented as a graph
+ *
+ * @author vpavlov
+ */
 public class MapGraph {
 
+    /**
+     * Graph structure represented by neighbours list
+     */
     private final List<GraphEntity> graph;
 
-    private final Map<Integer,List<Path>> paths = new HashMap<>();
+    /**
+     * The shortest path between warehouse --> oasis
+     */
+    private final Map<Integer, List<Path>> paths = new HashMap<>();
 
+    /**
+     * Constructor
+     *
+     * @param points -graph vertexes
+     */
     public MapGraph(List<Point> points) {
         graph = new ArrayList<>(points.size());
         for (Point p : points) {
@@ -15,7 +31,13 @@ public class MapGraph {
         }
     }
 
-    public void addBidirectionalEdge(int first, int second){
+    /**
+     * Creates new bidirectional edge between two vertexes
+     *
+     * @param first  -first vertex
+     * @param second -second vertex
+     */
+    public void addBidirectionalEdge(int first, int second) {
         GraphEntity firstVertex = graph.get(first);
         GraphEntity secondVertex = graph.get(second);
         firstVertex.addNeighbour(second);
@@ -37,7 +59,7 @@ public class MapGraph {
     }
 
     /**
-     * Search the shortest path between two points
+     * Search the shortest path between two points using A* algorithm
      *
      * @param start -start point
      * @param end   -end point
@@ -77,29 +99,39 @@ public class MapGraph {
             while ((p = previous.get(p)) != null) {
                 path.add(graph.get(p).point);
             }
-        }else{
+        } else {
             return null;
         }
 
         return path;
     }
 
-    public List<GraphEntity> getGraph(){
+    /**
+     * Graph structure getter
+     *
+     * @return graph structure
+     */
+    public List<GraphEntity> getGraph() {
         return graph;
     }
 
-    public void calculatePaths(int warehouseCount){
-        for (int i=warehouseCount; i<graph.size(); ++i){
-            for (int j=0;j<warehouseCount; ++j) {
-                List<Point> path = findPath(i,j);
+    /**
+     * Calculate the shortest paths between all warehouse --> oasis
+     *
+     * @param warehouseCount - count of warehouse
+     */
+    public void calculatePaths(int warehouseCount) {
+        for (int i = warehouseCount; i < graph.size(); ++i) {
+            for (int j = 0; j < warehouseCount; ++j) {
+                List<Point> path = findPath(i, j);
                 if (path != null) {
                     List<Path> pathList = paths.get(i);
                     if (pathList == null) {
                         pathList = new ArrayList<>();
-                        pathList.add(new Path(path,i,j));
+                        pathList.add(new Path(path, i, j));
                         paths.put(i, pathList);
-                    }else{
-                        pathList.add(new Path(path,i,j));
+                    } else {
+                        pathList.add(new Path(path, i, j));
                     }
 
                 }
@@ -107,10 +139,21 @@ public class MapGraph {
         }
     }
 
-    public List<Path> getPathsForOasis(int oasisId){
+    /**
+     * Oasis paths getter
+     *
+     * @param oasisId -oasisId to get paths for
+     * @return all the shortest paths between the given oasis and warehouses
+     */
+    public List<Path> getPathsForOasis(int oasisId) {
         return paths.get(oasisId);
     }
 
+    /**
+     * All the shortest paths getter
+     *
+     * @return all the shortest paths between warehouses and oasis
+     */
     public Collection<List<Path>> getPaths() {
         return paths.values();
     }

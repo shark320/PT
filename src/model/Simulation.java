@@ -70,13 +70,10 @@ public class Simulation {
 
         map = new MapGraph(points);
 
-        //roads = new boolean[warehouseCount + oasesCount][oasesCount + warehouseCount];
         this.roadsCount = Integer.parseInt(params[i++]);
         for (int j = 0; j < this.roadsCount; ++j) {
             int x = Integer.parseInt(params[i++]) - 1;
             int y = Integer.parseInt(params[i++]) - 1;
-//            roads[x][y] = true;
-//            roads[y][x] = true;
             map.addBidirectionalEdge(x, y);
         }
 

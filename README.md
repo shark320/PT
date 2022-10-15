@@ -1,2 +1,2 @@
 # PT
-Course work for PT
+Course work for Programming Techniques (School subject)

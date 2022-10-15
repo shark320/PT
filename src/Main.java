@@ -21,6 +21,7 @@ public class Main {
         String[] res = Parser.parseFile(new File("tutorial.txt"));
         Simulation simulation = new Simulation(res);
         System.out.println(simulation.toString());
+        simulation.generateCamel();
         //simulation.showPath(0,29);
     }
 }

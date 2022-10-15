@@ -26,7 +26,7 @@ public class Simulation {
     /**
      * List of camels
      */
-    private final List<Camel> camels = new LinkedList<>();
+    private final List<CamelType> camelTypes = new LinkedList<>();
 
     /**
      * List of map points (means warehouses and oases)
@@ -89,7 +89,7 @@ public class Simulation {
         int camelsCount = Integer.parseInt(params[i++]);
 
         for (int j = 0; j < camelsCount; ++j) {
-            Camel c = new Camel(
+            CamelType c = new CamelType(
                     params[i++],
                     Integer.parseInt(params[i++]),
                     Integer.parseInt(params[i++]),
@@ -99,7 +99,7 @@ public class Simulation {
                     Integer.parseInt(params[i++]),
                     Double.parseDouble(params[i++])
             );
-            camels.add(c);
+            camelTypes.add(c);
         }
 
         int requestsCount = Integer.parseInt(params[i++]);
@@ -198,6 +198,13 @@ public class Simulation {
         return path;
     }
 
+    public void generateCamel(){
+        for (int i=0; i<10;++i) {
+            Camel camel = new Camel(camelTypes.get(0));
+            System.out.println(camel);
+        }
+    }
+
 
     @Override
     public String toString() {
@@ -225,10 +232,10 @@ public class Simulation {
             }
         }
 
-        str.append(ConsoleColor.ANSI_GREEN).append("\n-------------------------------->>CAMELS [").append(camels.size()).append("]<<--------------------------------\n\n").append(ConsoleColor.ANSI_RESET);
-        str.append(ConsoleColor.ANSI_YELLOW).append("{tz} - request arrival time\n{tp} - request timeout\n{op} - oasis index to deliver\n{kp} - goods count\n\n").append(ConsoleColor.ANSI_RESET);
-        for (Camel camel : camels) {
-            str.append(camel.toString()).append("\n");
+        str.append(ConsoleColor.ANSI_GREEN).append("\n-------------------------------->>CAMEL TYPES [").append(camelTypes.size()).append("]<<--------------------------------\n\n").append(ConsoleColor.ANSI_RESET);
+        str.append(ConsoleColor.ANSI_YELLOW).append("{type} - camel type\n{vmin} - minimal speed\n{vmax} - maximal speed\n{dmin} - minimal distance\n{dmax} - maximal distance\n{td} - time to drink\n{kd} - maximal load\n{pd} - herd proportion   \n\n").append(ConsoleColor.ANSI_RESET);
+        for (CamelType camelType : camelTypes) {
+            str.append(camelType.toString()).append("\n");
         }
 
         str.append(ConsoleColor.ANSI_GREEN).append("\n-------------------------------->>REQUESTS [").append(requests.size()).append("]<<--------------------------------\n\n").append(ConsoleColor.ANSI_RESET);

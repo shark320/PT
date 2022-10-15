@@ -1,73 +1,58 @@
 package model;
 
+import java.util.Random;
+
 /**
- * Class represents camel
+ * Represents the exact camel
  *
  * @author vpavlov
  */
 public class Camel {
 
     /**
-     * Type of camel
+     * Global camel count
      */
-    private final String type;
+    private static int camelCount = 0;
+
+    /**
+     * Camel id
+     */
+    private final int id = camelCount++;
+
+    /**
+     * Camel type {type}
+     */
+    private final CamelType type;
 
     /**
      * Camel speed {v}
      */
-    //@TODO Random generating
     private final double speed;
 
     /**
-     * Camel maximal distance {d}
+     * Camel distance {d}
      */
-
-    //@TODO Random generating
     private final double distance;
 
     /**
-     * Time to drink water {td}
-     */
-    private final int drinkTime;
-
-    /**
-     * Camel maximum possible load {kd}
-     */
-    private final int maxLoad;
-
-    /**
-     * Camel proportion in a herd {pd}
-     */
-    private final double proportion;
-
-    /**
      * Constructor
-     *
-     * @param type        -camel type
-     * @param maxSpeed    -camel max speed
-     * @param minSeed     -camel min seed
-     * @param maxDistance -camel max distance
-     * @param minDistance -camel min distance
-     * @param drinkTime   -camel drink time
-     * @param maxLoad     -camel max load
-     * @param proportion  - camel proportion in a herd
+     * @param type - type of Camel
      */
-    public Camel(String type, int maxSpeed, int minSeed, int maxDistance, int minDistance, int drinkTime, int maxLoad, double proportion) {
+    public Camel(CamelType type) {
+        Random rand = new Random();
         this.type = type;
-        this.speed = (minSeed + maxSpeed) / 2.0;
-        this.distance = (maxDistance + minDistance) / 2.0;
-        this.drinkTime = drinkTime;
-        this.maxLoad = maxLoad;
-        this.proportion = proportion;
+
+        //speed random generating (Continuous uniform distribution)
+        this.speed = type.getMinSpeed() + rand.nextDouble() * (type.getMaxSpeed() - type.getMinSpeed());
+
+        //distance random generating (Normal distribution)
+        double deviation = (type.getMaxSpeed() - type.getMinSpeed())/4;
+        double mean = (type.getMaxSpeed() + type.getMinSpeed())/2;
+        this.distance = rand.nextDouble() * deviation + mean;
     }
 
     @Override
     public String toString() {
-        return "<CAMEL>[type=" + this.type
-                + ", v=" + this.speed
-                + ", d=" + this.distance
-                + ", td=" + this.drinkTime
-                + ", kd=" + this.maxLoad
-                + ", pd=" + proportion + "]";
+        return "<CAMEL>[id=" + id +", type="+ this.type.getType() + ", v=" + speed + ", d=" + distance + "]";
     }
 }

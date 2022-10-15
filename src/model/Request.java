@@ -8,6 +8,16 @@ package model;
 public class Request {
 
     /**
+     * Global requests count
+     */
+    private static int requestCounter = 0;
+
+    /**
+     * Request number {p}
+     */
+    private final int number = ++requestCounter;
+
+    /**
      * Request arrival time {tz}
      */
     private final int time;
@@ -80,7 +90,8 @@ public class Request {
 
     @Override
     public String toString() {
-        return "<REQUEST>[tz=" + this.time
+        return "<REQUEST>[p="+this.number
+                + ", tz=" + this.time
                 + ", tp=" + this.timeout
                 + ", op=" + this.oasisId
                 + ", kp=" + this.goodsCount

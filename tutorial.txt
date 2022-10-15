@@ -30,7 +30,7 @@
 🐪 Pocet druhu velbloudu D: 🏜
 2
 🐪 Definice velblouda (nazev, minimalni rychlost, maximalni rychlost, minimalni vzdalenost, maximalni vzdalenost, doba piti, maximalni zatizeni a procentualni pomer druhu velblouda)  🏜
-Pomaly 1 1 1000 1000 0 1 0.5
+Pomaly 1 5 1000 1500 0 1 0.5
 Ziznivy 10 10 1 1 10 1 0.5
 🐪 Pocet pozadavku P: 🏜
 8

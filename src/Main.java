@@ -18,10 +18,11 @@ public class Main {
      * @author vpavlov
      */
     public static void main(String[] args) {
-        String[] res = Parser.parseFile(new File("tutorial.txt"));
+        String[] res = Parser.parseFile(new File("test_input.txt"));
         Simulation simulation = new Simulation(res);
         System.out.println(simulation.toString());
-        simulation.generateCamel();
+        //simulation.generateCamel();
         //simulation.showPath(0,29);
+        simulation.showPaths();
     }
 }

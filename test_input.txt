@@ -1,6 +1,7 @@
 🐪 Kazdy komentar zacina znakem velblouda (U+1F42A) a konci znakem pouste (U+1F3DC), jakekoliv bile znaky ignorujte 🏜
 🐪 Pocet skladu S: 🏜
-0
+1
+3 3 3 1000 1
 🐪 Pocet oaz O: 🏜
 30
 🐪 Definice oaz (souradnice x,y) 🏜

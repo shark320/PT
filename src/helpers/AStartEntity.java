@@ -11,7 +11,7 @@ public class AStartEntity implements Comparable<AStartEntity> {
     /**
      * Map point to save
      */
-    public Point point;
+    public int pointId;
 
     /**
      * Priority of the entity
@@ -21,11 +21,11 @@ public class AStartEntity implements Comparable<AStartEntity> {
     /**
      * Constructor
      *
-     * @param point    - point to save
+     * @param pointId    - point to save
      * @param priority - priority of the entity
      */
-    public AStartEntity(Point point, int priority) {
-        this.point = point;
+    public AStartEntity(int pointId, int priority) {
+        this.pointId = pointId;
         this.priority = priority;
     }
 

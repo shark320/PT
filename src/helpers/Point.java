@@ -31,6 +31,17 @@ public class Point {
     }
 
     /**
+     * Calculate distance between two points
+     *
+     * @param p1 - first point
+     * @param p2 - second point
+     * @return distance between points
+     */
+    public static double getDistance(Point p1, Point p2) {
+        return Math.sqrt((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y));
+    }
+
+    /**
      * X-coordinate getter
      *
      * @return X-coordinate

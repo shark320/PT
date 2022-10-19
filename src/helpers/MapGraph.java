@@ -145,8 +145,9 @@ public class MapGraph {
      * @param oasisId -oasisId to get paths for
      * @return all the shortest paths between the given oasis and warehouses
      */
-    public List<Path> getPathsForOasis(int oasisId) {
-        return paths.get(oasisId);
+    public PriorityQueue<Path> getPathsForOasis(int oasisId) {
+        return new PriorityQueue<Path>(paths.get(oasisId));
+        //return paths.get(oasisId);
     }
 
     /**

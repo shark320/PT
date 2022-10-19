@@ -5,7 +5,7 @@ import java.util.*;
 /**
  * Path from warehouse to oasis
  */
-public class Path {
+public class Path implements Comparable<Path> {
 
     /**
      * Path from warehouse to oasis
@@ -59,6 +59,14 @@ public class Path {
 
     @Override
     public String toString() {
-        return "Path: "+(warehouse_id+1)+" --> "+(oasis_id+1) +" "+points;
+        return String.format("Path [%f]: (%d --> %d) %s", distance,warehouse_id + 1,oasis_id + 1,points);
+        //return "Path []: " + (warehouse_id + 1) + " --> " + (oasis_id + 1) + " " + points;
+    }
+
+    @Override
+    public int compareTo(Path o) {
+        double diff = this.distance - o.distance;
+        if (diff == 0.0) return 0;
+        return diff < 0 ? -1 : 1;
     }
 }

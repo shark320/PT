@@ -48,12 +48,16 @@ public class CamelType {
      */
     private final double proportion;
 
+    private final double distanceDeviation;
+
+    private final double distanceMean;
+
     /**
      * Constructor
      *
      * @param type        -camel type
      * @param maxSpeed    -camel max speed
-     * @param minSpeed     -camel min seed
+     * @param minSpeed    -camel min seed
      * @param maxDistance -camel max distance
      * @param minDistance -camel min distance
      * @param drinkTime   -camel drink time
@@ -69,6 +73,8 @@ public class CamelType {
         this.drinkTime = drinkTime;
         this.maxLoad = maxLoad;
         this.proportion = proportion;
+        this.distanceDeviation = (maxDistance - minDistance) / 4;
+        this.distanceMean = (maxDistance + minDistance) / 2;
     }
 
     /**
@@ -82,6 +88,7 @@ public class CamelType {
 
     /**
      * Minimal speed getter
+     *
      * @return minimal speed
      */
     public double getMinSpeed() {
@@ -90,6 +97,7 @@ public class CamelType {
 
     /**
      * Maximal speed getter
+     *
      * @return maximal speed
      */
     public double getMaxSpeed() {
@@ -98,6 +106,7 @@ public class CamelType {
 
     /**
      * Minimal distance getter
+     *
      * @return minimal distance
      */
     public double getMinDistance() {
@@ -106,10 +115,29 @@ public class CamelType {
 
     /**
      * Maximal distance getter
+     *
      * @return maximal distance
      */
     public double getMaxDistance() {
         return maxDistance;
+    }
+
+    /**
+     * Distance generation deviation getter
+     *
+     * @return distance deviation
+     */
+    public double getDistanceDeviation() {
+        return distanceDeviation;
+    }
+
+    /**
+     * Distance generation mean
+     *
+     * @return distance mean
+     */
+    public double getDistanceMean() {
+        return distanceMean;
     }
 
     @Override

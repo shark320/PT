@@ -3,9 +3,10 @@ package console;
 import javax.swing.*;
 import javax.swing.text.*;
 import java.awt.*;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+
+import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
 /**
  * Log console in a special window with multiply colors logs
@@ -75,13 +76,18 @@ public class LogConsole extends OutputStream {
         frame.setTitle("Log Console");
         frame.setVisible(true);
         printStream = new PrintStream(this);
+        frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
 
     @Override
-    public void write(int b) throws IOException {
+    public void write(int b){
         int len = textArea.getDocument().getLength();
         textArea.setCaretPosition(len);
         textArea.replaceSelection(String.valueOf((char) b));
+    }
+
+    public void logTimestamp(String timestamp){
+        printStream.print(timestamp+"  ");
     }
 
     /**

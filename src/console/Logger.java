@@ -113,7 +113,8 @@ public class Logger {
         if (console == null) {
             throw new UnsupportedOperationException("Console is not connected to the logger.");
         }
-        console.log(timestamp() + "  " + message);
+        console.logTimestamp(timestamp());
+        console.log(message);
     }
 
     /**
@@ -127,7 +128,8 @@ public class Logger {
         if (console == null) {
             throw new UnsupportedOperationException("Console is not connected to the logger.");
         }
-        console.log(timestamp() + "  " + message, color);
+        console.logTimestamp(timestamp());
+        console.log(message, color);
     }
 
     /**
@@ -141,13 +143,13 @@ public class Logger {
         if (console == null) {
             throw new UnsupportedOperationException("Console is not connected to the logger.");
         }
-
+        console.logTimestamp(timestamp());
         switch (type) {
-            case INFO       -> console.log(timestamp() + "  " + "[INFO] " + message, INFO_TEXT_COLOR);
-            case WARNING    -> console.log(timestamp() + "  " + "[WARN] " + message, WARNING_TEXT_COLOR);
-            case ERROR      -> console.log(timestamp() + "  " + "[ERROR] " + message, ERROR_TEXT_COLOR);
-            case HEADER     -> console.log(timestamp() + "  " + message, HEADER_TEXT_COLOR);
-            default         -> console.log(timestamp() + "  " + message, INFO_TEXT_COLOR);
+            case INFO       -> console.log("[INFO] " + message, INFO_TEXT_COLOR);
+            case WARNING    -> console.log("[WARN] " + message, WARNING_TEXT_COLOR);
+            case ERROR      -> console.log( "[ERROR] " + message, ERROR_TEXT_COLOR);
+            case HEADER     -> console.log(message, HEADER_TEXT_COLOR);
+            default         -> console.log(message, INFO_TEXT_COLOR);
         }
     }
 

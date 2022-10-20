@@ -46,8 +46,8 @@ public class Camel {
         this.speed = type.getMinSpeed() + rand.nextDouble() * (type.getMaxSpeed() - type.getMinSpeed());
 
         //distance random generating (Normal distribution)
-        double deviation = (type.getMaxSpeed() - type.getMinSpeed())/4;
-        double mean = (type.getMaxSpeed() + type.getMinSpeed())/2;
+        double deviation = type.getDistanceDeviation();
+        double mean = type.getDistanceMean();
         this.distance = rand.nextDouble() * deviation + mean;
     }
 

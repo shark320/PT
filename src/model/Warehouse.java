@@ -2,10 +2,7 @@ package model;
 
 import helpers.Point;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Class represents warehouse
@@ -86,12 +83,51 @@ public class Warehouse {
         return goodsAmount;
     }
 
-    public void supply(double currentTime){
-        int supplyCount = (int)Math.floor(currentTime-previousSupply);
-        goodsAmount += supplyCount*supplyCount;
+    public void supply(double currentTime) {
+        int supplyCount = (int) Math.floor(currentTime - previousSupply);
+        goodsAmount += supplyCount * supplyCount;
     }
 
+    /**
+     * Helper method <br>
+     * Generates given amount of camels with specified type
+     *
+     * @param type   type of camels to generate
+     * @param amount amount of camels to generate
+     * @return set of generated camels
+     */
+    private Set<Camel> generateCamels(CamelType type, long amount) {
+        Set<Camel> result = new HashSet<>();
+        for (long i = 0; i < amount; i++) {
+            result.add(new Camel(type));
+        }
+        return result;
+    }
 
+    /**
+     * Generate camels according to their proportion <br>
+     * Adds generated camels to the warehouse
+     *
+     * @param type  type of camels to return
+     * @param types types of camels
+     * @return set of camels with specified type
+     */
+    public Set<Camel> generateCamels(CamelType type, List<CamelType> types) {
+        double minProportion = types.stream().min(Comparator.comparingDouble(CamelType::getProportion)).get().getProportion();
+        long amount = Math.round(1 / minProportion + 0.5) * 2;
+        Set<Camel> result = new HashSet<>();
+
+        for (CamelType camelType : types) {
+            if (camelType.getType().equals(type.getType())) {
+                result = generateCamels(camelType, Math.round(camelType.getProportion() * amount));
+                camels.addAll(result);
+            } else {
+                camels.addAll(generateCamels(camelType, Math.round(camelType.getProportion() * amount)));
+            }
+        }
+
+        return result;
+    }
 
     @Override
     public String toString() {

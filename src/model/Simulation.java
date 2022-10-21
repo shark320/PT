@@ -1,8 +1,12 @@
 package model;
 
+import console.Logger;
 import helpers.*;
+import helpers.Point;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 /**
  * Class represents simulation
@@ -29,21 +33,28 @@ public class Simulation {
     /**
      * List of requests
      */
-    private final List<Request> requests = new LinkedList<>();
+    private final PriorityQueue<Request> requests = new PriorityQueue<>();
 
     private final MapGraph map;
+
+    private final EventLogger eventLogger = new EventLogger();
+
+    private final Logger logger;
 
     /**
      * Count of roads
      */
     private final int roadsCount;
 
+    private double currentTime;
+
     /**
      * Constructor
      *
      * @param params -parameters of the simulation
      */
-    public Simulation(String[] params) {
+    public Simulation(String[] params, Logger logger) {
+        this.logger = logger;
         int i = 0;
         int warehouseCount = Integer.parseInt(params[i++]);
         List<Point> points = new ArrayList<>();
@@ -69,7 +80,6 @@ public class Simulation {
         }
 
         map = new MapGraph(points);
-
         this.roadsCount = Integer.parseInt(params[i++]);
         for (int j = 0; j < this.roadsCount; ++j) {
             int x = Integer.parseInt(params[i++]) - 1;
@@ -77,7 +87,6 @@ public class Simulation {
             map.addBidirectionalEdge(x, y);
         }
 
-        map.calculatePaths(warehouseCount);
 
         int camelsCount = Integer.parseInt(params[i++]);
 
@@ -95,6 +104,8 @@ public class Simulation {
             camelTypes.add(c);
         }
 
+        map.calculateEffectivePaths(warehouseCount, camelTypes);
+
         int requestsCount = Integer.parseInt(params[i++]);
         for (int j = 0; j < requestsCount; j++) {
             Request r = new Request(
@@ -107,41 +118,61 @@ public class Simulation {
         }
     }
 
-    /**
-     * Heuristic function to determine point priority in A* algorithm
-     *
-     * @param first  -first point
-     * @param second -second point
-     * @return Manhattan distance between points
-     */
-    private int heuristic(Point first, Point second) {
-        if (first == null || second == null) {
-            throw new NullPointerException("two points must not be null");
-        }
-        return Math.abs(first.getX() - second.getX()) + Math.abs(first.getY() - second.getY());
-    }
-
 
     public void showPath(int i, int j) {
         System.out.println(map.findPath(i, j));
     }
 
-    public void showPaths(){
-        for (List<Path> pathList : map.getPaths()){
-            for (Path p:pathList) {
-                System.out.println(p);
+    public void showPaths() {
+//        for (List<Path> pathList : map.getPaths()){
+//            for (Path p:pathList) {
+//                System.out.println(p);
+//            }
+//        }
+        PriorityQueue<Path> pathList = map.getPathsForOasis(3);
+        for (Path p : map.getPathsForOasis(4)) {
+            logger.logToConsole(p.toString(), Color.CYAN);
+        }
+    }
+
+
+    /**
+     * Supply all warehouses
+     *
+     * @param currentTime current simulation time
+     */
+    private void supplyWarehouses(double currentTime) {
+        for (Warehouse w : warehouses) {
+            w.supply(currentTime);
+        }
+    }
+
+    public void simulate() {
+        while (!requests.isEmpty()) {
+            //TODO log events [Events logger]
+            Request request = requests.poll();
+            currentTime = request.getTime();
+            supplyWarehouses(currentTime);
+        }
+    }
+
+    private List<Request> getActualRequests() {
+        List<Request> requestList = new LinkedList<>();
+        Request request;
+
+        for (; ; ) {
+            request = requests.peek();
+            if (request == null) {
+                return requestList;
+            }
+            if (request.getTime() <= currentTime) {
+                requestList.add(request);
+                requests.poll();
+            } else {
+                return requestList;
             }
         }
     }
-
-
-    public void generateCamel() {
-        for (int i = 0; i < 10; ++i) {
-            Camel camel = new Camel(camelTypes.get(0));
-            System.out.println(camel);
-        }
-    }
-
 
     @Override
     public String toString() {

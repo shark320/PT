@@ -5,7 +5,7 @@ package model;
  *
  * @author vpavlov
  */
-public class Request {
+public class Request implements Comparable<Request>{
 
     /**
      * Global requests count
@@ -15,11 +15,12 @@ public class Request {
     /**
      * Request number {p}
      */
-    private final int number = ++requestCounter;
+    private final int id = ++requestCounter;
 
     /**
      * Request arrival time {tz}
      */
+    //TODO: datatype double
     private final int time;
 
     /**
@@ -45,7 +46,7 @@ public class Request {
      * @param oasisId    - oasis id {op}
      * @param goodsCount - amount of goods needed {kp}
      */
-    public Request(int time, int timeout, int oasisId, int goodsCount) {
+    public Request(int time,int oasisId, int goodsCount ,   int timeout) {
         this.time = time;
         this.timeout = timeout;
         this.oasisId = oasisId;
@@ -90,11 +91,16 @@ public class Request {
 
     @Override
     public String toString() {
-        return "<REQUEST>[p="+this.number
+        return "<REQUEST>[id="+this.id
                 + ", tz=" + this.time
                 + ", tp=" + this.timeout
                 + ", op=" + this.oasisId
                 + ", kp=" + this.goodsCount
                 + "]";
+    }
+
+    @Override
+    public int compareTo(Request o) {
+        return this.time - o.time;
     }
 }

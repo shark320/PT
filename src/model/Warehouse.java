@@ -2,6 +2,11 @@ package model;
 
 import helpers.Point;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 /**
  * Class represents warehouse
  *
@@ -13,6 +18,11 @@ public class Warehouse {
      * Location of the warehouse {x , y}
      */
     private final Point location;
+
+    /**
+     * Camels for the warehouse
+     */
+    private final Set<Camel> camels = new HashSet<>();
 
     /**
      * Current amount of goods {tc}
@@ -27,17 +37,19 @@ public class Warehouse {
     /**
      * Timeout of supply {ts}
      */
-    private final int supplyTimeout;
+    //TODO datatype double
+    private final long supplyTimeout;
 
     /**
      * Time is needed for load one good {tn}
      */
-    private final int loadingTime;
+    //TODO datatype double
+    private final long loadingTime;
 
     /**
      * Previous supply time (first supply at the beginning of a simulation) {ps}
      */
-    private final int previousSupply = 0;
+    private double previousSupply = 0;
 
     /**
      * Constructor
@@ -48,7 +60,7 @@ public class Warehouse {
      * @param supplyTimeout - supply timeout
      * @param loadingTime   - loading time
      */
-    public Warehouse(int x, int y, int supplyAmount, int supplyTimeout, int loadingTime) {
+    public Warehouse(int x, int y, int supplyAmount, long supplyTimeout, int loadingTime) {
         this.location = new Point(x, y);
         this.supplyAmount = supplyAmount;
         this.supplyTimeout = supplyTimeout;
@@ -73,6 +85,13 @@ public class Warehouse {
     public int getGoodsAmount() {
         return goodsAmount;
     }
+
+    public void supply(double currentTime){
+        int supplyCount = (int)Math.floor(currentTime-previousSupply);
+        goodsAmount += supplyCount*supplyCount;
+    }
+
+
 
     @Override
     public String toString() {

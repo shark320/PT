@@ -27,6 +27,11 @@ public enum LogType {
     HEADER,
 
     /**
+     * Event tag
+     */
+    EVENT,
+
+    /**
      * Default tag
      */
     DEFAULT

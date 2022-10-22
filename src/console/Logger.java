@@ -35,6 +35,11 @@ public class Logger {
     private static final Color INFO_TEXT_COLOR = Color.WHITE;
 
     /**
+     * Text color for event
+     */
+    private static final Color EVENT_TEXT_COLOR = Color.PINK;
+
+    /**
      * Date formatter for timestamps
      */
     private static final DateTimeFormatter DTF = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss.SSS");
@@ -145,11 +150,12 @@ public class Logger {
         }
         console.logTimestamp(timestamp());
         switch (type) {
-            case INFO       -> console.log("[INFO] " + message, INFO_TEXT_COLOR);
-            case WARNING    -> console.log("[WARN] " + message, WARNING_TEXT_COLOR);
-            case ERROR      -> console.log( "[ERROR] " + message, ERROR_TEXT_COLOR);
-            case HEADER     -> console.log(message, HEADER_TEXT_COLOR);
-            default         -> console.log(message, INFO_TEXT_COLOR);
+            case INFO -> console.log("[INFO] " + message, INFO_TEXT_COLOR);
+            case WARNING -> console.log("[WARN] " + message, WARNING_TEXT_COLOR);
+            case ERROR -> console.log("[ERROR] " + message, ERROR_TEXT_COLOR);
+            case HEADER -> console.log(message, HEADER_TEXT_COLOR);
+            case EVENT -> console.log(message, EVENT_TEXT_COLOR);
+            default -> console.log(message, INFO_TEXT_COLOR);
         }
     }
 
@@ -178,20 +184,41 @@ public class Logger {
             throw new UnsupportedOperationException("File is not connected to the logger.");
         }
         switch (type) {
-            case INFO -> {
-                file.println(timestamp() + "  " + "[INFO] " + message);
-            }
-            case WARNING -> {
-                file.println(timestamp() + "  " + "[WARN] " + message);
-            }
-            case ERROR -> {
-                file.println(timestamp() + "  " + "[ERROR] " + message);
-            }
-            default -> {
-                file.println(timestamp() + "  " + message);
-            }
+            case INFO -> file.println(timestamp() + "  " + "[INFO] " + message);
+
+            case WARNING -> file.println(timestamp() + "  " + "[WARN] " + message);
+
+            case ERROR -> file.println(timestamp() + "  " + "[ERROR] " + message);
+
+            case EVENT -> file.println(timestamp() + " " + "[EVENT] " + message);
+
+            default -> file.println(timestamp() + "  " + message);
+
         }
 
+    }
+
+    /**
+     * Log message to the console and to the file at the same time (if there are connected) <br>
+     * If one of the outputs are not connected, then log is carried out only for onew
+     *
+     * @param message message to log
+     * @param logType logging tag
+     * @throws UnsupportedOperationException if both outputs are not connected.
+     */
+    public void log(String message, LogType logType) throws UnsupportedOperationException {
+        boolean success = false;
+        if (file != null) {
+            logToFile(message, logType);
+            success = true;
+        }
+        if (console != null) {
+            logToConsole(message, logType);
+            success = true;
+        }
+        if (!success) {
+            throw new UnsupportedOperationException("Console and file are not connected to the logger.");
+        }
     }
 
     /**

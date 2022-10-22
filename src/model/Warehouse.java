@@ -11,6 +11,10 @@ import java.util.*;
  */
 public class Warehouse {
 
+    private static final int MAGIC_NUMBER = 2;
+
+    private final int id;
+
     /**
      * Location of the warehouse {x , y}
      */
@@ -40,8 +44,7 @@ public class Warehouse {
     /**
      * Time is needed for load one good {tn}
      */
-    //TODO datatype double
-    private final long loadingTime;
+    private final double loadingTime;
 
     /**
      * Previous supply time (first supply at the beginning of a simulation) {ps}
@@ -57,7 +60,8 @@ public class Warehouse {
      * @param supplyTimeout - supply timeout
      * @param loadingTime   - loading time
      */
-    public Warehouse(int x, int y, int supplyAmount, long supplyTimeout, int loadingTime) {
+    public Warehouse(int id, int x, int y, int supplyAmount, long supplyTimeout, int loadingTime) {
+        this.id = id;
         this.location = new Point(x, y);
         this.supplyAmount = supplyAmount;
         this.supplyTimeout = supplyTimeout;
@@ -83,6 +87,10 @@ public class Warehouse {
         return goodsAmount;
     }
 
+    public double getLoadingTime() {
+        return loadingTime;
+    }
+
     public void supply(double currentTime) {
         int supplyCount = (int) Math.floor(currentTime - previousSupply);
         goodsAmount += supplyCount * supplyCount;
@@ -99,7 +107,7 @@ public class Warehouse {
     private Set<Camel> generateCamels(CamelType type, long amount) {
         Set<Camel> result = new HashSet<>();
         for (long i = 0; i < amount; i++) {
-            result.add(new Camel(type));
+            result.add(new Camel(type, this.id));
         }
         return result;
     }
@@ -112,9 +120,9 @@ public class Warehouse {
      * @param types types of camels
      * @return set of camels with specified type
      */
-    public Set<Camel> generateCamels(CamelType type, List<CamelType> types) {
+    public List<Camel> generateCamels(CamelType type, List<CamelType> types) {
         double minProportion = types.stream().min(Comparator.comparingDouble(CamelType::getProportion)).get().getProportion();
-        long amount = Math.round(1 / minProportion + 0.5) * 2;
+        long amount = Math.round(1 / minProportion + 0.5) * MAGIC_NUMBER;
         Set<Camel> result = new HashSet<>();
 
         for (CamelType camelType : types) {
@@ -126,7 +134,19 @@ public class Warehouse {
             }
         }
 
-        return result;
+        return result.stream().toList();
+    }
+
+    public List<Camel> getCamelsByType(CamelType type) {
+       return camels.stream().filter(c->c.getType().equals(type)).toList();
+    }
+
+    public void removeCamel(Camel camel){
+        camels.remove(camel);
+    }
+
+    public void returnCamel(Camel camel){
+        camels.add(camel);
     }
 
     @Override

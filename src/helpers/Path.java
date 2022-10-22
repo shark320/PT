@@ -4,6 +4,8 @@ import java.util.*;
 
 /**
  * Path from warehouse to oasis
+ *
+ * @author vpavlov
  */
 public class Path implements Comparable<Path> {
 
@@ -70,9 +72,7 @@ public class Path implements Comparable<Path> {
 
     @Override
     public int compareTo(Path o) {
-        double diff = this.distance - o.distance;
-        if (diff == 0.0) return 0;
-        return diff < 0 ? -1 : 1;
+        return Double.compare(distance,o.distance);
     }
 
     @Override

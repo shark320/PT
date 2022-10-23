@@ -9,6 +9,7 @@ import helpers.Point;
  */
 public class Oasis {
 
+    private final int id;
     /**
      * Oasis location {x , y}
      */
@@ -20,8 +21,9 @@ public class Oasis {
      * @param x - X-coordinate
      * @param y - Y-coordinate
      */
-    public Oasis(int x, int y) {
-        location = new Point(x, y);
+    public Oasis(int id, double x, double y) {
+        this.id = id;
+        location = new Point(x, y, this.id);
     }
 
     /**

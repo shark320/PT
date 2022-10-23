@@ -16,21 +16,21 @@ public class AStartEntity implements Comparable<AStartEntity> {
     /**
      * Priority of the entity
      */
-    public int priority;
+    public double priority;
 
     /**
      * Constructor
      *
-     * @param pointId    - point to save
+     * @param pointId  - point to save
      * @param priority - priority of the entity
      */
-    public AStartEntity(int pointId, int priority) {
+    public AStartEntity(int pointId, double priority) {
         this.pointId = pointId;
         this.priority = priority;
     }
 
     @Override
     public int compareTo(AStartEntity o) {
-        return o.priority - this.priority;
+        return Double.compare( this.priority , o.priority);
     }
 }

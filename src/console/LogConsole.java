@@ -13,6 +13,7 @@ import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
  *
  * @author vpavlov
  */
+//TODO Speed up swing console using detached document and thread unlocking
 public class LogConsole extends OutputStream {
 
     /**
@@ -24,6 +25,11 @@ public class LogConsole extends OutputStream {
      * Default text color
      */
     private static final Color DEFAULT_TEXT_COLOR = Color.WHITE;
+
+    /**
+     * Timestamp color
+     */
+    private static final Color TIMESTAMP_COLOR = Color.CYAN;
 
     /**
      * Default font name
@@ -80,14 +86,21 @@ public class LogConsole extends OutputStream {
     }
 
     @Override
-    public void write(int b){
+    public void write(int b) {
         int len = textArea.getDocument().getLength();
         textArea.setCaretPosition(len);
         textArea.replaceSelection(String.valueOf((char) b));
     }
 
-    public void logTimestamp(String timestamp){
-        printStream.print(timestamp+"  ");
+    /**
+     * Logs a timestamp to the console
+     *
+     * @param timestamp timestamp to log
+     */
+    public void logTimestamp(String timestamp) {
+        setColor(TIMESTAMP_COLOR);
+        printStream.print(timestamp + "\t");
+        resetColor();
     }
 
     /**
@@ -97,6 +110,7 @@ public class LogConsole extends OutputStream {
      */
     public void log(String message) {
         printStream.println(message);
+        printStream.println();
     }
 
     /**
@@ -108,6 +122,7 @@ public class LogConsole extends OutputStream {
     public void log(String message, Color color) {
         setColor(color);
         printStream.println(message);
+        printStream.println();
         resetColor();
     }
 

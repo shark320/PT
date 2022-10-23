@@ -63,7 +63,7 @@ public class MapGraph {
         if (first == null || second == null) {
             throw new NullPointerException("two points must not be null");
         }
-        return Math.abs(first.getX() - second.getX()) + Math.abs(first.getY() - second.getY());
+        return Math.abs(first.x() - second.x()) + Math.abs(first.y() - second.y());
     }
 
     /**

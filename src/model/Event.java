@@ -1,11 +1,11 @@
 package model;
 
 public class Event implements Comparable<Event> {
-    private final long time;
+    private final double time;
 
     private final String message;
 
-    public Event(long time, String message) throws IllegalArgumentException {
+    public Event(double time, String message) throws IllegalArgumentException {
         if (time<0){
             throw new IllegalArgumentException("Time must be positive");
         }
@@ -16,7 +16,7 @@ public class Event implements Comparable<Event> {
         this.message = message;
     }
 
-    public long getTime() {
+    public double getTime() {
         return time;
     }
 
@@ -25,7 +25,12 @@ public class Event implements Comparable<Event> {
     }
 
     @Override
+    public String toString() {
+        return "[time=" + time + ", message=" + message + "]";
+    }
+
+    @Override
     public int compareTo(Event o) {
-        return 0;
+        return Double.compare(time, o.getTime());
     }
 }

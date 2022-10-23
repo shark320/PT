@@ -32,6 +32,11 @@ public enum LogType {
     EVENT,
 
     /**
+     * Help info tag
+     */
+    HELP_INFO,
+
+    /**
      * Default tag
      */
     DEFAULT

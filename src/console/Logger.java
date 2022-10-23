@@ -40,6 +40,11 @@ public class Logger {
     private static final Color EVENT_TEXT_COLOR = Color.PINK;
 
     /**
+     * Text color for help info
+     */
+    private static final Color HELP_TEXT_COLOR = Color.YELLOW;
+
+    /**
      * Date formatter for timestamps
      */
     private static final DateTimeFormatter DTF = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss.SSS");
@@ -154,7 +159,8 @@ public class Logger {
             case WARNING -> console.log("[WARN] " + message, WARNING_TEXT_COLOR);
             case ERROR -> console.log("[ERROR] " + message, ERROR_TEXT_COLOR);
             case HEADER -> console.log(message, HEADER_TEXT_COLOR);
-            case EVENT -> console.log(message, EVENT_TEXT_COLOR);
+            case EVENT -> console.log("[EVENT] "+message, EVENT_TEXT_COLOR);
+            case HELP_INFO -> console.log("[HELP] "+message, HELP_TEXT_COLOR);
             default -> console.log(message, INFO_TEXT_COLOR);
         }
     }

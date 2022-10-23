@@ -17,20 +17,26 @@ public class MapGraph {
     private final List<GraphEntity> graph;
 
     /**
-     * The shortest path between warehouse --> oasis
+     * The shortest path between path --> oasis
      */
     private final Map<Integer, List<Path>> paths = new HashMap<>();
+
+    private final int warehouseCount;
+
+    private final PriorityQueue<CamelType> camelTypes;
 
     /**
      * Constructor
      *
      * @param points -graph vertexes
      */
-    public MapGraph(List<Point> points) {
+    public MapGraph(List<Point> points,PriorityQueue<CamelType> camelTypes, int warehouseCount) {
         graph = new ArrayList<>(points.size());
         for (Point p : points) {
             graph.add(new GraphEntity(p));
         }
+        this.camelTypes = camelTypes;
+        this.warehouseCount = warehouseCount;
     }
 
     /**
@@ -53,7 +59,7 @@ public class MapGraph {
      * @param second -second point
      * @return Manhattan distance between points
      */
-    private int heuristic(Point first, Point second) {
+    private double heuristic(Point first, Point second) {
         if (first == null || second == null) {
             throw new NullPointerException("two points must not be null");
         }
@@ -81,13 +87,13 @@ public class MapGraph {
 
     /**
      * Helper method <br>
-     * Checks if specified camel type can pass the distance between two points <br>
-     * Checks does not occur if camel type is null
+     * Checks if specified camel camelType can pass the distance between two points <br>
+     * Checks does not occur if camel camelType is null
      *
      * @param point1    first point
      * @param point2    second point
-     * @param camelType camel type to check
-     * @return true if this camel type can pass the distance between two points, else false
+     * @param camelType camel camelType to check
+     * @return true if this camel camelType can pass the distance between two points, else false
      */
     private boolean checkDistance(int point1, int point2, CamelType camelType) {
         if (camelType == null) {
@@ -96,17 +102,17 @@ public class MapGraph {
         Point p1 = graph.get(point1).point;
         Point p2 = graph.get(point2).point;
         double distance = Point.getDistance(p1, p2);
-        return distance < (camelType.getDistanceMean() + 2 * camelType.getDistanceDeviation());
+        return distance < camelType.getEffectiveDistance();
     }
 
     /**
      * Helper method <br>
-     * Calculates the shortest paths between previous points and the end, that can be pass by camel type
+     * Calculates the shortest paths between previous points and the end, that can be pass by camel camelType
      *
      * @param end       path target
      * @param previous  previous points in the path
      * @param queue     points queue to check
-     * @param camelType camel type to check the path. If camelType is null, then check will not occur
+     * @param camelType camel camelType to check the path. If camelType is null, then check will not occur
      */
 
     private void calculatePath(int end, Map<Integer, Integer> previous, PriorityQueue<AStartEntity> queue, CamelType camelType) {
@@ -122,7 +128,7 @@ public class MapGraph {
                 for (int next : neighbours) {
                     if (!previous.containsKey(next)) {
                         if (checkDistance(current, next, camelType)) {
-                            int priority = heuristic(graph.get(end).point, graph.get(next).point);
+                            double priority = heuristic(graph.get(end).point, graph.get(next).point);
                             queue.add(new AStartEntity(next, priority));
                             previous.put(next, current);
                         }
@@ -158,11 +164,11 @@ public class MapGraph {
 
     /**
      * Searches the shortest path between two points using A* algorithm <br>
-     * Checks if the specified camel type can pass this path
+     * Checks if the specified camel camelType can pass this path
      *
      * @param start     start point
      * @param end       end point
-     * @param camelType camel type to check
+     * @param camelType camel camelType to check
      * @return Linked Set of points that encapsulates path (end -> start). If there is no path, null.
      */
     public List<Point> findEffectivePath(int start, int end, CamelType camelType) {
@@ -187,9 +193,9 @@ public class MapGraph {
     }
 
     /**
-     * Calculate the shortest paths between all warehouse --> oasis
+     * Calculate the shortest paths between all path --> oasis
      *
-     * @param warehouseCount - count of warehouse
+     * @param warehouseCount - count of path
      */
     public void calculatePaths(int warehouseCount) {
         for (int i = warehouseCount; i < graph.size(); ++i) {
@@ -210,7 +216,7 @@ public class MapGraph {
         }
     }
 
-    private void addPathsForOasis(int oasisId, List<Path> pathList, Set<Path> toAdd) {
+    private List<Path> addPathsForOasis(int oasisId, List<Path> pathList, Set<Path> toAdd) {
         if (!toAdd.isEmpty()) {
             if (pathList == null) {
                 pathList = new ArrayList<>(toAdd);
@@ -220,16 +226,18 @@ public class MapGraph {
             }
 
         }
+        return pathList;
     }
 
     /**
-     * Calculate the shortest and effective paths between all warehouse --> oasis
+     * Calculate the shortest and effective paths between all path --> oasis
      *
-     * @param warehouseCount - count of warehouse
+     * @param warehouseCount - count of path
      */
-    public void calculateEffectivePaths(int warehouseCount, List<CamelType> camelTypes) {
+    public void calculateEffectivePaths(int warehouseCount, PriorityQueue<CamelType> camelTypes) {
         for (int i = warehouseCount; i < graph.size(); ++i) {
             List<Path> pathList = paths.get(i);
+            long start = System.currentTimeMillis();
             for (int j = 0; j < warehouseCount; ++j) {
                 Set<Path> oasisPaths = new HashSet<>();
                 for (CamelType camelType : camelTypes) {
@@ -239,9 +247,30 @@ public class MapGraph {
                         oasisPaths.add(p);
                     }
                 }
-                addPathsForOasis(i, pathList, oasisPaths);
+
+                pathList = addPathsForOasis(i, pathList, oasisPaths);
             }
+            long elapsed = System.currentTimeMillis() - start;
+            System.out.printf("[DEBUG %.2f%%] calculating path  for oasis %d  elapsed: %d ms\n",(i-warehouseCount)/(double)(graph.size()-warehouseCount)*100,i,elapsed);
         }
+    }
+
+    private List<Path> calculatePathsForOasis(int oasisId){
+        List<Path> pathList = paths.get(oasisId);
+        for (int j = 0; j < warehouseCount; ++j) {
+            Set<Path> oasisPaths = new HashSet<>();
+            for (CamelType camelType : camelTypes) {
+                List<Point> path = findEffectivePath(oasisId, j, camelType);
+                if (path != null) {
+                    Path p = new Path(path, oasisId, j);
+                    oasisPaths.add(p);
+                }
+            }
+
+            pathList = addPathsForOasis(oasisId, pathList, oasisPaths);
+        }
+
+        return pathList;
     }
 
 
@@ -252,7 +281,11 @@ public class MapGraph {
      * @return all the shortest paths between the given oasis and warehouses
      */
     public PriorityQueue<Path> getPathsForOasis(int oasisId) {
-        return new PriorityQueue<>(paths.get(oasisId));
+        List<Path> result = paths.get(oasisId);
+        if (result == null){
+            result = calculatePathsForOasis(oasisId);
+        }
+        return new PriorityQueue<>(result);
         //return paths.get(oasisId);
     }
 

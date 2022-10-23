@@ -5,12 +5,12 @@ package model;
  *
  * @author vpavlov
  */
-public class CamelType {
+public class CamelType implements Comparable<CamelType> {
 
     /**
-     * Type of camel {type}
+     * Type of camel {camelType}
      */
-    private final String type;
+    private final String name;
 
 
     /**
@@ -41,7 +41,7 @@ public class CamelType {
     /**
      * Camel maximum possible load {kd}
      */
-    private final double maxLoad;
+    private final int maxLoad;
 
     /**
      * Camel proportion in a herd {pd}
@@ -52,10 +52,14 @@ public class CamelType {
 
     private final double distanceMean;
 
+    private final double effectiveDistance;
+
+    private final double efficiency;
+
     /**
      * Constructor
      *
-     * @param type        -camel type
+     * @param name        -camel camelType
      * @param maxSpeed    -camel max speed
      * @param minSpeed    -camel min seed
      * @param maxDistance -camel max distance
@@ -64,8 +68,8 @@ public class CamelType {
      * @param maxLoad     -camel max load
      * @param proportion  - camel proportion in a herd
      */
-    public CamelType(String type, double minSpeed, double maxSpeed, double minDistance, double maxDistance, double drinkTime, double maxLoad, double proportion) {
-        this.type = type;
+    public CamelType(String name, double minSpeed, double maxSpeed, double minDistance, double maxDistance, double drinkTime, int maxLoad, double proportion) {
+        this.name = name;
         this.minSpeed = minSpeed;
         this.maxSpeed = maxSpeed;
         this.minDistance = minDistance;
@@ -75,15 +79,21 @@ public class CamelType {
         this.proportion = proportion;
         this.distanceDeviation = (maxDistance - minDistance) / 4;
         this.distanceMean = (maxDistance + minDistance) / 2;
+        this.effectiveDistance = distanceMean + 2 * distanceDeviation;
+        this.efficiency=setEfficiency();
+    }
+
+    private double setEfficiency(){
+        return ((maxSpeed+minSpeed)/2)*effectiveDistance*maxLoad;
     }
 
     /**
      * Type title getter
      *
-     * @return camel type title
+     * @return camel camelType title
      */
-    public String getType() {
-        return type;
+    public String getName() {
+        return name;
     }
 
     /**
@@ -140,9 +150,35 @@ public class CamelType {
         return distanceMean;
     }
 
+    /**
+     * This camel camelType proportion getter
+     *
+     * @return proportion
+     */
+    public double getProportion() {
+        return proportion;
+    }
+
+    /**
+     * Gets effective distance for this camel camelType
+     *
+     * @return distanceMean + 2 * distanceDeviation
+     */
+    public double getEffectiveDistance() {
+        return effectiveDistance;
+    }
+
+    public int getMaxLoad() {
+        return maxLoad;
+    }
+
+    public double getDrinkTime() {
+        return drinkTime;
+    }
+
     @Override
     public String toString() {
-        return "<CAMEL TYPE>[type=" + this.type
+        return "<CAMEL TYPE>[camelType=" + this.name
                 + ", vmin=" + this.minSpeed
                 + ", vmax=" + this.maxSpeed
                 + ", dmin=" + this.minDistance
@@ -150,5 +186,18 @@ public class CamelType {
                 + ", td=" + this.drinkTime
                 + ", kd=" + this.maxLoad
                 + ", pd=" + proportion + "]";
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof CamelType) {
+            return this.name.equals(((CamelType)obj).name);
+        }
+        return false;
+    }
+
+    @Override
+    public int compareTo(CamelType o) {
+        return Double.compare(o.efficiency, this.efficiency);
     }
 }

@@ -5,23 +5,29 @@ import helpers.Point;
 import java.util.*;
 
 /**
- * Class represents warehouse
+ * Class represents path
  *
  * @author vpavlov
  */
 public class Warehouse {
 
+    /**
+     * Magic number for camels generation
+     */
     private static final int MAGIC_NUMBER = 2;
 
+    /**
+     * This warehouse id
+     */
     private final int id;
 
     /**
-     * Location of the warehouse {x , y}
+     * Location of the path {x , y}
      */
     private final Point location;
 
     /**
-     * Camels for the warehouse
+     * Camels for the path
      */
     private final Set<Camel> camels = new HashSet<>();
 
@@ -38,8 +44,7 @@ public class Warehouse {
     /**
      * Timeout of supply {ts}
      */
-    //TODO datatype double
-    private final long supplyTimeout;
+    private final double supplyTimeout;
 
     /**
      * Time is needed for load one good {tn}
@@ -60,9 +65,9 @@ public class Warehouse {
      * @param supplyTimeout - supply timeout
      * @param loadingTime   - loading time
      */
-    public Warehouse(int id, int x, int y, int supplyAmount, long supplyTimeout, int loadingTime) {
+    public Warehouse(int id, double x, double y, int supplyAmount, double supplyTimeout, double loadingTime) {
         this.id = id;
-        this.location = new Point(x, y);
+        this.location = new Point(x, y, id);
         this.supplyAmount = supplyAmount;
         this.supplyTimeout = supplyTimeout;
         this.loadingTime = loadingTime;
@@ -72,7 +77,7 @@ public class Warehouse {
     /**
      * Location getter
      *
-     * @return warehouse location
+     * @return path location
      */
     public Point getLocation() {
         return location;
@@ -87,20 +92,59 @@ public class Warehouse {
         return goodsAmount;
     }
 
+    /**
+     * Loading time getter
+     *
+     * @return loading time
+     */
     public double getLoadingTime() {
         return loadingTime;
     }
 
+    /**
+     * Id getter
+     *
+     * @return warehouse id
+     */
+    public int getId() {
+        return id;
+    }
+
+    /**
+     * Camels count getter
+     *
+     * @return all types of camels count
+     */
+    public int getCamelsCount() {
+        return camels.size();
+    }
+
+    /**
+     * Camels count getter by type
+     *
+     * @param type type to count
+     * @return count of camels with specified type
+     */
+    public long getCamelsCount(CamelType type) {
+        return camels.stream().filter(c -> c.getType().equals(type)).count();
+    }
+
+    /**
+     * Process warehouse supply
+     *
+     * @param currentTime current simulation time
+     */
     public void supply(double currentTime) {
         int supplyCount = (int) Math.floor(currentTime - previousSupply);
-        goodsAmount += supplyCount * supplyCount;
+        previousSupply = currentTime;
+        goodsAmount += supplyCount;
     }
 
     /**
      * Helper method <br>
-     * Generates given amount of camels with specified type
+     * Generates given amount of camels with specified camelType
      *
-     * @param type   type of camels to generate
+     * @param type   camelType of camels to generate
      * @param amount amount of camels to generate
      * @return set of generated camels
      */
@@ -114,19 +158,19 @@ public class Warehouse {
 
     /**
      * Generate camels according to their proportion <br>
-     * Adds generated camels to the warehouse
+     * Adds generated camels to the path
      *
-     * @param type  type of camels to return
+     * @param type  camelType of camels to return
      * @param types types of camels
-     * @return set of camels with specified type
+     * @return set of camels with specified camelType
      */
-    public List<Camel> generateCamels(CamelType type, List<CamelType> types) {
+    public List<Camel> generateCamels(CamelType type, PriorityQueue<CamelType> types) {
         double minProportion = types.stream().min(Comparator.comparingDouble(CamelType::getProportion)).get().getProportion();
         long amount = Math.round(1 / minProportion + 0.5) * MAGIC_NUMBER;
         Set<Camel> result = new HashSet<>();
 
         for (CamelType camelType : types) {
-            if (camelType.getType().equals(type.getType())) {
+            if (camelType.getName().equals(type.getName())) {
                 result = generateCamels(camelType, Math.round(camelType.getProportion() * amount));
                 camels.addAll(result);
             } else {
@@ -137,22 +181,36 @@ public class Warehouse {
         return result.stream().toList();
     }
 
+    /**
+     * @param type
+     * @return
+     */
     public List<Camel> getCamelsByType(CamelType type) {
-       return camels.stream().filter(c->c.getType().equals(type)).toList();
+        return camels.stream().filter(c -> c.getType().equals(type)).toList();
     }
 
-    public void removeCamel(Camel camel){
+    /**
+     * Remove specified camel from the warehouse
+     *
+     * @param camel camel to remove
+     */
+    public void removeCamel(Camel camel) {
         camels.remove(camel);
     }
 
-    public void returnCamel(Camel camel){
+    /**
+     * Return specified camel to the warehouse
+     *
+     * @param camel camel to return
+     */
+    public void returnCamel(Camel camel) {
         camels.add(camel);
     }
 
     @Override
     public String toString() {
-        return "<WAREHOUSE>[x=" + this.location.getX()
-                + ", y=" + this.location.getY()
+        return "<WAREHOUSE>[x=" + this.location.x()
+                + ", y=" + this.location.y()
                 + ", ks=" + this.supplyAmount
                 + ", ts=" + this.supplyTimeout
                 + ", tn=" + this.loadingTime

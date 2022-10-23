@@ -4,20 +4,12 @@ package helpers;
  * Class encapsulates X and Y map coordinates
  * Can not be changed (read only)
  *
+ * @param x  X-coordinate
+ * @param y  Y-coordinate
+ * @param id Oasis or warehouse id where this point represents location
  * @author vpavlov
  */
-public class Point {
-
-    /**
-     * X-coordinate
-     */
-    private final int x;
-
-    /**
-     * Y-coordinate
-     */
-    private final int y;
-
+public record Point(double x, double y, int id) {
 
     /**
      * Constructor
@@ -25,9 +17,7 @@ public class Point {
      * @param x - X-coordinate
      * @param y - Y-coordinate
      */
-    public Point(int x, int y) {
-        this.x = x;
-        this.y = y;
+    public Point {
     }
 
     /**
@@ -46,7 +36,8 @@ public class Point {
      *
      * @return X-coordinate
      */
-    public int getX() {
+    @Override
+    public double x() {
         return x;
     }
 
@@ -55,9 +46,21 @@ public class Point {
      *
      * @return Y-coordinate
      */
-    public int getY() {
+    @Override
+    public double y() {
         return y;
     }
+
+    /**
+     * Id getter
+     *
+     * @return Oasis or warehouse id where this point represents location
+     */
+    @Override
+    public int id() {
+        return id;
+    }
+
 
     /**
      * Check if two points are equal (the same X and Y coordinates)
@@ -66,7 +69,7 @@ public class Point {
      * @return true if points are equal, else - false
      */
     public boolean isEqual(Point p) {
-        return x == p.x && y == p.y;
+        return Double.compare(x, p.x) == 0 && Double.compare(y, p.y) == 0;
     }
 
     @Override

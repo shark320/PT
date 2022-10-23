@@ -37,6 +37,6 @@ public class Oasis {
 
     @Override
     public String toString() {
-        return "<OASIS>[x=" + this.location.getX() + ", y=" + this.location.getY() + "]";
+        return "<OASIS>[x=" + this.location.x() + ", y=" + this.location.y() + "]";
     }
 }

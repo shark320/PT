@@ -20,7 +20,7 @@ public class Camel implements Comparable<Camel>{
     private final int id = camelCount++;
 
     /**
-     * Camel type {type}
+     * Camel camelType {camelType}
      */
     private final CamelType type;
 
@@ -40,7 +40,7 @@ public class Camel implements Comparable<Camel>{
 
     /**
      * Constructor
-     * @param type - type of Camel
+     * @param type - camelType of Camel
      */
     public Camel(CamelType type, int warehouseId) {
         Random rand = new Random();
@@ -72,9 +72,21 @@ public class Camel implements Comparable<Camel>{
         return type;
     }
 
+    public double getSpeed() {
+        return speed;
+    }
+
+    public double getDistance() {
+        return distance;
+    }
+
+    public int getId() {
+        return id;
+    }
+
     @Override
     public String toString() {
-        return "<CAMEL>[id=" + id +", type="+ this.type.getType() + ", v=" + speed + ", d=" + distance + "]";
+        return "<CAMEL>[id=" + id +", camelType="+ this.type.getName() + ", v=" + speed + ", d=" + distance + "]";
     }
 
     @Override

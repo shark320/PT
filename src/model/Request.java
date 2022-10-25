@@ -28,6 +28,11 @@ public class Request implements Comparable<Request> {
     private final double timeout;
 
     /**
+     * Postpone request processing time
+     */
+    private double postponeTime;
+
+    /**
      * Oasis id {op}
      */
     private final int oasisId;
@@ -50,6 +55,7 @@ public class Request implements Comparable<Request> {
         this.timeout = timeout;
         this.oasisId = oasisId;
         this.goodsCount = goodsCount;
+        this.postponeTime = time;
     }
 
     /**
@@ -98,8 +104,42 @@ public class Request implements Comparable<Request> {
                 + "]";
     }
 
+    /**
+     * Postpone request
+     *
+     * @param postponeTime postpone time
+     * @return true if request can be postponed, false if there is request timeout
+     */
+    public boolean postpone(double postponeTime) {
+        this.postponeTime = postponeTime;
+        return timeout > (time + postponeTime);
+    }
+
+    /**
+     * Postpone time getter
+     *
+     * @return postpone time
+     */
+    public double getPostponeTime() {
+        return postponeTime;
+    }
+
+    /**
+     * Sorting method<br>
+     * Sorts requests by their remaining time to process
+     *
+     * @param r1 first request
+     * @param r2 second request
+     * @return -1 if the first request has less time to process <br>
+     * 1 if the second request has less time to process <br>
+     * 0 if the times to process are equal
+     */
+    public static int sortByTimeout(Request r1, Request r2) {
+        return Double.compare((r1.time + r1.timeout) - r1.postponeTime, (r2.time + r2.timeout) - r2.postponeTime);
+    }
+
     @Override
     public int compareTo(Request o) {
-        return Double.compare(this.time, o.time);
+        return Double.compare(this.postponeTime, o.postponeTime);
     }
 }

@@ -22,6 +22,8 @@ public class Simulation {
      */
     private final List<Warehouse> warehouses = new ArrayList<>();
 
+    private final PriorityQueue<WarehouseSupply> warehouseSupplies = new PriorityQueue<>();
+
     /**
      * List of oases
      */
@@ -89,6 +91,7 @@ public class Simulation {
             );
             points.add(w.getLocation());
             warehouses.add(w);
+            warehouseSupplies.add(new WarehouseSupply(w));
         }
         int oasesCount = Integer.parseInt(params[i++]);
         for (int j = 0; j < oasesCount; ++j) {
@@ -163,8 +166,28 @@ public class Simulation {
      * @param currentTime current simulation time
      */
     private void supplyWarehouses(double currentTime) {
-        for (Warehouse w : warehouses) {
-            w.supply(currentTime);
+        WarehouseSupply warehouseSupply;
+        Warehouse w;
+        for (; ; ) {
+            warehouseSupply = warehouseSupplies.peek();
+            if (warehouseSupply == null) {
+                break;
+            }
+            if (warehouseSupply.getNextSupplyTime() <= currentTime) {
+                w = warehouseSupply.warehouse();
+                warehouseSupplies.poll();
+                eventLogger.addEvent(
+                        currentTime,
+                        String.format(
+                                "Cas: %d, Sklad: %d, Doslo k doplneni skladu o %d kosu",
+                                Math.round(currentTime),
+                                w.getId(),
+                                w.supply()
+                        ));
+                warehouseSupplies.add(new WarehouseSupply(w));
+            } else {
+                break;
+            }
         }
     }
 
@@ -208,12 +231,17 @@ public class Simulation {
      * @param timeout time to process the request
      * @return path, fitting camel type and minimal possible speed to pass the path
      */
-    private PathCamelType getFitCamelType(Path path, int goods, double timeout) {
+    private PathCamelType getFitCamelType(Path path, int goods, double timeout) throws NoGoodsException {
         double time;
+        boolean noGoods = true;
         double minPossibleSpeed;
         Warehouse w = warehouses.get(path.getWarehouseId());
         for (CamelType type : camelTypes) {
-            if ((w.getGoodsAmount() < Math.min(goods, type.getMaxLoad())) || (path.getMaxTransitionDistance() > type.getEffectiveDistance())) {
+            if (w.getGoodsAmount() < Math.min(goods, type.getMaxLoad())) {
+                continue;
+            }
+            noGoods = false;
+            if ((path.getMaxTransitionDistance() > type.getEffectiveDistance())) {
                 continue;
             }
             minPossibleSpeed = computePathForCamelType(w, path, type, goods, timeout);
@@ -221,6 +249,9 @@ public class Simulation {
                 continue;
             }
             return new PathCamelType(type, path, minPossibleSpeed);
+        }
+        if (noGoods) {
+            throw new NoGoodsException();
         }
         return null;
     }
@@ -233,7 +264,7 @@ public class Simulation {
      * @param timeout time for pass the path
      * @return fitting path, fitting camel type and minimal possible speed to pass the path
      */
-    private PathCamelType getRequestFirCamelType(PriorityQueue<Path> paths, int goods, double timeout) {
+    private PathCamelType getRequestFirCamelType(PriorityQueue<Path> paths, int goods, double timeout) throws NoGoodsException {
         PathCamelType fitCamelType;
         for (Path path : paths) {
             fitCamelType = getFitCamelType(path, goods, timeout);
@@ -323,6 +354,8 @@ public class Simulation {
         int prepareGoods = Math.min(goods, maxLoad);
         double prepareTime = prepareGoods * loadingTime;
 
+        warehouse.removeGoods(prepareGoods);
+
         //preparing camel
         eventLogger.addEvent(
                 time,
@@ -411,7 +444,7 @@ public class Simulation {
      * @param request request to process
      * @return fitting path and camel
      */
-    private PathCamel camelPrepare(Request request) {
+    private PathCamel camelPrepare(Request request) throws NoGoodsException {
         int oasisId = request.getOasisId() + warehouses.size() - 1;
         PriorityQueue<Path> paths = map.getPathsForOasis(oasisId);
         PathCamelType fitCamelType;
@@ -445,7 +478,7 @@ public class Simulation {
      * @param currentTime current time
      * @return true if computing was success, else - false
      */
-    private boolean computeRequest(Request request, double currentTime) {
+    private boolean computeRequest(Request request, double currentTime) throws NoGoodsException {
         int goods = request.getGoodsCount();
         PathCamel pathCamel;
         while (goods > 0) {
@@ -458,35 +491,74 @@ public class Simulation {
         return true;
     }
 
+    private boolean isSuppliesFirst(double currentTime) {
+        WarehouseSupply supplier = warehouseSupplies.peek();
+        if (supplier == null) {
+            return false;
+        }
+        int compare = Double.compare(currentTime, supplier.getNextSupplyTime());
+        return compare >= 0;
+    }
+
     /**
      * Starts the harpagon simulation
      */
     public void simulate() {
+        double nextSupply;
+        boolean isCrashed = false;
         while (!requests.isEmpty()) {
+            nextSupply = Double.POSITIVE_INFINITY;
             List<Request> actualRequests = getActualRequests();
-            double currentTime = actualRequests.get(0).getTime();
+            actualRequests.sort(Request::sortByTimeout);
+            double currentTime = actualRequests.get(0).getPostponeTime();
             returnCamels(currentTime);
+
+            if (isSuppliesFirst(currentTime)) {
+                supplyWarehouses(currentTime);
+            }
+            if (warehouseSupplies.peek() != null) {
+                nextSupply = warehouseSupplies.peek().getNextSupplyTime();
+
+            }
             eventLogger.log(currentTime);
-            supplyWarehouses(currentTime);
             for (Request request : actualRequests) {
-                if (!computeRequest(request, currentTime)) {
-                    logger.log(
-                            String.format(
-                                    "Cas: %d, Oaza: %d, Vsichni vymreli, Harpagon zkrachoval, Konec simulace",
-                                    Math.round(currentTime),
-                                    request.getOasisId()
-                            ),
-                            LogType.ERROR
-                    );
-                    break;
+                System.out.println(request);
+                try {
+                    if (!computeRequest(request, currentTime)) {
+                        simulationCrashed(request, currentTime);
+                        isCrashed = true;
+                        break;
+                    }
+                }catch(NoGoodsException e){
+                    if (!request.postpone(nextSupply)) {
+                        simulationCrashed(request, currentTime);
+                        isCrashed = true;
+                        break;
+                    } else {
+                        requests.add(request);
+                    }
                 }
             }
         }
-        returnCamels(Double.POSITIVE_INFINITY);
-        eventLogger.logAll();
-        countCamels();
-        countCamelsByType();
+        if (!isCrashed) {
+            returnCamels(Double.POSITIVE_INFINITY);
+            eventLogger.logAll();
+        }
+            countCamels();
+            countCamelsByType();
+
         simulationEnd();
+    }
+
+    private void simulationCrashed(Request request, double currentTime) {
+        logger.log(
+                String.format(
+                        "Cas: %d, Oaza: %d, Vsichni vymreli, Harpagon zkrachoval, Konec simulace",
+                        Math.round(currentTime),
+                        request.getOasisId()
+                ),
+                LogType.ERROR
+        );
     }
 
     /**

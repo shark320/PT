@@ -242,6 +242,6 @@ public class Warehouse implements Comparable<Warehouse> {
 
     @Override
     public int compareTo(Warehouse o) {
-        return Double.compare(this.nextSupply, o.nextSupply);
+        return o.goodsAmount - this.goodsAmount;
     }
 }

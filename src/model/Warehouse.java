@@ -9,7 +9,7 @@ import java.util.*;
  *
  * @author vpavlov
  */
-public class Warehouse {
+public class Warehouse implements Comparable<Warehouse> {
 
     /**
      * Magic number for camels generation
@@ -54,7 +54,7 @@ public class Warehouse {
     /**
      * Previous supply time (first supply at the beginning of a simulation) {ps}
      */
-    private double previousSupply = 0;
+    private double nextSupply;
 
     /**
      * Constructor
@@ -72,6 +72,7 @@ public class Warehouse {
         this.supplyTimeout = supplyTimeout;
         this.loadingTime = loadingTime;
         this.goodsAmount = supplyAmount;
+        this.nextSupply = supplyTimeout;
     }
 
     /**
@@ -130,14 +131,24 @@ public class Warehouse {
     }
 
     /**
+     * Next supply time getter
+     *
+     * @return next supply time
+     */
+    public double getNextSupply() {
+        return nextSupply;
+    }
+
+    /**
      * Process warehouse supply
      *
-     * @param currentTime current simulation time
+     * @return amount of goods that have been supplied
      */
-    public void supply(double currentTime) {
-        int supplyCount = (int) Math.floor(currentTime - previousSupply);
-        previousSupply = currentTime;
-        goodsAmount += supplyCount;
+    public int supply() {
+        nextSupply = nextSupply + supplyTimeout;
+        goodsAmount += this.supplyAmount;
+        System.out.println("Supply: " + goodsAmount);
+        return this.supplyAmount;
     }
 
     /**
@@ -207,6 +218,16 @@ public class Warehouse {
         camels.add(camel);
     }
 
+    /**
+     * Removes specified amount of goods from the warehouse
+     *
+     * @param goodsAmount goods amount to remove
+     */
+    public void removeGoods(int goodsAmount) {
+        this.goodsAmount -= goodsAmount;
+    }
+
+
     @Override
     public String toString() {
         return "<WAREHOUSE>[x=" + this.location.x()
@@ -215,7 +236,12 @@ public class Warehouse {
                 + ", ts=" + this.supplyTimeout
                 + ", tn=" + this.loadingTime
                 + ", tc=" + this.goodsAmount
-                + ", ps=" + this.previousSupply
+                + ", ps=" + this.nextSupply
                 + "]";
+    }
+
+    @Override
+    public int compareTo(Warehouse o) {
+        return Double.compare(this.nextSupply, o.nextSupply);
     }
 }

@@ -1,5 +1,6 @@
 package helpers;
 
+import java.util.NoSuchElementException;
 import java.util.PriorityQueue;
 
 /**
@@ -20,6 +21,7 @@ public interface IOasisPathsGetter {
      * Get paths to the next warehouse
      *
      * @return paths to the next warehouse
+     * @throws NoSuchElementException if there is no next paths
      */
-    PriorityQueue<Path> getNextPaths();
+    PriorityQueue<Path> getNextPaths() throws NoSuchElementException;
 }

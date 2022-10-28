@@ -1,6 +1,7 @@
 package helpers;
 
 import model.CamelType;
+import model.Warehouse;
 
 import java.util.*;
 
@@ -12,6 +13,66 @@ import java.util.*;
 public class MapGraph {
 
     /**
+     * Inner class to get paths for oasis
+     *
+     * @author vpavlov
+     */
+    private class OasisPathsGetter implements IOasisPathsGetter {
+
+        /**
+         * Current warehouse index (from the sorted list)
+         */
+        private int currentWarehouse = 0;
+
+        /**
+         * Oasis id
+         */
+        private final int oasisId;
+
+        /**
+         * Path for the oasis
+         */
+        private final HashMap<Warehouse, PriorityQueue<Path>> oasisPaths;
+
+        /**
+         * Constructor
+         *
+         * @param oasisId oasis id to het path for
+         * @throws IllegalArgumentException if oasis id is out of bounds
+         */
+        OasisPathsGetter(int oasisId) throws IllegalArgumentException {
+            if (oasisId < warehouses.size()) {
+                throw new IllegalArgumentException(String.format("Illegal oasis id %d. Oasis id should be in [%d,%d]", oasisId, warehouseCount, graph.size() - 1));
+            }
+            warehouses.sort(null);
+            this.oasisId = oasisId;
+            oasisPaths = paths.get(oasisId);
+        }
+
+        @Override
+        public boolean hasNext() {
+            return currentWarehouse < warehouses.size();
+        }
+
+        @Override
+        public PriorityQueue<Path> getNextPaths() {
+            if (warehouseCount <= currentWarehouse) {
+                throw new NoSuchElementException("Oasis has no next paths");
+            }
+            Warehouse warehouse = warehouses.get(currentWarehouse);
+            PriorityQueue<Path> pathsQueue = oasisPaths.get(warehouse);
+            if (pathsQueue == null) {
+                pathsQueue = findEffectivePaths(oasisId, warehouse.getId());
+                oasisPaths.put(warehouse, pathsQueue);
+            }
+            ++currentWarehouse;
+            return pathsQueue;
+        }
+
+
+    }
+
+    /**
      * Graph structure represented by neighbours list
      */
     private final List<GraphEntity> graph;
@@ -19,10 +80,21 @@ public class MapGraph {
     /**
      * The shortest path between path --> oasis
      */
-    private final Map<Integer, List<Path>> paths = new HashMap<>();
+    private final Map<Integer, HashMap<Warehouse, PriorityQueue<Path>>> paths = new HashMap<>();
 
+    /**
+     * List of warehouses
+     */
+    private final List<Warehouse> warehouses;
+
+    /**
+     * Warehouses count
+     */
     private final int warehouseCount;
 
+    /**
+     * Camel types
+     */
     private final PriorityQueue<CamelType> camelTypes;
 
     /**
@@ -30,14 +102,60 @@ public class MapGraph {
      *
      * @param points -graph vertexes
      */
-    public MapGraph(List<Point> points,PriorityQueue<CamelType> camelTypes, int warehouseCount) {
+    public MapGraph(List<Point> points, PriorityQueue<CamelType> camelTypes, List<Warehouse> warehouses) {
         graph = new ArrayList<>(points.size());
         for (Point p : points) {
             graph.add(new GraphEntity(p));
         }
         this.camelTypes = camelTypes;
-        this.warehouseCount = warehouseCount;
+        this.warehouses = new ArrayList<>(warehouses);
+        this.warehouseCount = warehouses.size();
+        initPaths();
     }
+
+    /**
+     * Initializes paths map with warehouses and null paths sets
+     */
+    private void initPaths() {
+        HashMap<Warehouse, PriorityQueue<Path>> oasisPaths = new HashMap<>();
+        for (int i = warehouseCount; i < graph.size(); i++) {
+            for (Warehouse w : warehouses) {
+                oasisPaths.put(w, null);
+            }
+            paths.put(i, oasisPaths);
+        }
+    }
+
+    /**
+     * OasisPathsGetter getter
+     *
+     * @param oasisId oasis id
+     * @return OasisPathsGetter for the specified oasis
+     */
+    public OasisPathsGetter getPathsForOasis(int oasisId) {
+        return new OasisPathsGetter(oasisId);
+    }
+
+    /**
+     * Find all effective paths from start point to end point according to camel types
+     *
+     * @param start start path point
+     * @param end   end path point
+     * @return priority queue with paths
+     */
+    private PriorityQueue<Path> findEffectivePaths(int start, int end) {
+        Set<Path> oasisPaths = new HashSet<>();
+        for (CamelType camelType : camelTypes) {
+            List<Point> path = findEffectivePath(start, end, camelType);
+            if (path != null) {
+                Path p = new Path(path, start, end);
+                oasisPaths.add(p);
+            }
+        }
+
+        return new PriorityQueue<>(oasisPaths);
+    }
+
 
     /**
      * Creates new bidirectional edge between two vertexes
@@ -192,12 +310,12 @@ public class MapGraph {
         return graph;
     }
 
-    /**
+    /*
      * Calculate the shortest paths between all path --> oasis
      *
      * @param warehouseCount - count of path
      */
-    public void calculatePaths(int warehouseCount) {
+/*    public void calculatePaths(int warehouseCount) {
         for (int i = warehouseCount; i < graph.size(); ++i) {
             for (int j = 0; j < warehouseCount; ++j) {
                 List<Point> path = findPath(i, j);
@@ -214,9 +332,9 @@ public class MapGraph {
                 }
             }
         }
-    }
+    }*/
 
-    private List<Path> addPathsForOasis(int oasisId, List<Path> pathList, Set<Path> toAdd) {
+/*    private List<Path> addPathsForOasis(int oasisId, Set<Path> pathList, Set<Path> toAdd) {
         if (!toAdd.isEmpty()) {
             if (pathList == null) {
                 pathList = new ArrayList<>(toAdd);
@@ -227,16 +345,14 @@ public class MapGraph {
 
         }
         return pathList;
-    }
+    }*/
 
-    /**
-     * Calculate the shortest and effective paths between all path --> oasis
-     *
-     * @param warehouseCount - count of path
+    /*
+     * Calculate the shortest and effective paths between all warehouse --> oasis
      */
-    public void calculateEffectivePaths(int warehouseCount, PriorityQueue<CamelType> camelTypes) {
+/*    public void calculateEffectivePaths() {
         for (int i = warehouseCount; i < graph.size(); ++i) {
-            List<Path> pathList = paths.get(i);
+            Set<Path> pathList = paths.get(i);
             long start = System.currentTimeMillis();
             for (int j = 0; j < warehouseCount; ++j) {
                 Set<Path> oasisPaths = new HashSet<>();
@@ -251,11 +367,11 @@ public class MapGraph {
                 pathList = addPathsForOasis(i, pathList, oasisPaths);
             }
             long elapsed = System.currentTimeMillis() - start;
-            System.out.printf("[DEBUG %.2f%%] calculating path  for oasis %d  elapsed: %d ms\n",(i-warehouseCount)/(double)(graph.size()-warehouseCount)*100,i,elapsed);
+            System.out.printf("[DEBUG %.2f%%] calculating path  for oasis %d  elapsed: %d ms\n", (i - warehouseCount) / (double) (graph.size() - warehouseCount) * 100, i, elapsed);
         }
-    }
+    }*/
 
-    private List<Path> calculatePathsForOasis(int oasisId){
+/*    private List<Path> calculatePathsForOasis(int oasisId) {
         List<Path> pathList = paths.get(oasisId);
         for (int j = 0; j < warehouseCount; ++j) {
             Set<Path> oasisPaths = new HashSet<>();
@@ -271,30 +387,30 @@ public class MapGraph {
         }
 
         return pathList;
-    }
+    }*/
 
 
-    /**
+    /*
      * Oasis paths getter
      *
      * @param oasisId -oasisId to get paths for
      * @return all the shortest paths between the given oasis and warehouses
      */
-    public PriorityQueue<Path> getPathsForOasis(int oasisId) {
+/*    public PriorityQueue<Path> getPathsForOasis(int oasisId) {
         List<Path> result = paths.get(oasisId);
         if (result == null){
             result = calculatePathsForOasis(oasisId);
         }
         return new PriorityQueue<>(result);
         //return paths.get(oasisId);
-    }
+    }*/
 
-    /**
+    /*
      * All the shortest paths getter
      *
      * @return all the shortest paths between warehouses and oasis
      */
-    public Collection<List<Path>> getPaths() {
+    /*public Collection<List<Path>> getPaths() {
         return paths.values();
-    }
+    }*/
 }

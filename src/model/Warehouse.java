@@ -57,6 +57,11 @@ public class Warehouse implements Comparable<Warehouse> {
     private double nextSupply;
 
     /**
+     * Warehouse priority
+     */
+    private double priority;
+
+    /**
      * Constructor
      *
      * @param x             - X-coordinate
@@ -73,6 +78,14 @@ public class Warehouse implements Comparable<Warehouse> {
         this.loadingTime = loadingTime;
         this.goodsAmount = supplyAmount;
         this.nextSupply = supplyTimeout;
+        setPriority();
+    }
+
+    /**
+     * Sets warehouse priority according to loading time and goods amount
+     */
+    private void setPriority() {
+        priority = supplyAmount / loadingTime * camels.size();
     }
 
     /**
@@ -147,7 +160,7 @@ public class Warehouse implements Comparable<Warehouse> {
     public int supply() {
         nextSupply = nextSupply + supplyTimeout;
         goodsAmount += this.supplyAmount;
-        System.out.println("Supply: " + goodsAmount);
+        setPriority();
         return this.supplyAmount;
     }
 
@@ -164,6 +177,7 @@ public class Warehouse implements Comparable<Warehouse> {
         for (long i = 0; i < amount; i++) {
             result.add(new Camel(type, this.id));
         }
+        setPriority();
         return result;
     }
 
@@ -193,8 +207,10 @@ public class Warehouse implements Comparable<Warehouse> {
     }
 
     /**
-     * @param type
-     * @return
+     * Specified type camels getter
+     *
+     * @param type camels type to het
+     * @return camels with specified type
      */
     public List<Camel> getCamelsByType(CamelType type) {
         return camels.stream().filter(c -> c.getType().equals(type)).toList();
@@ -225,6 +241,7 @@ public class Warehouse implements Comparable<Warehouse> {
      */
     public void removeGoods(int goodsAmount) {
         this.goodsAmount -= goodsAmount;
+        setPriority();
     }
 
 
@@ -242,6 +259,6 @@ public class Warehouse implements Comparable<Warehouse> {
 
     @Override
     public int compareTo(Warehouse o) {
-        return o.goodsAmount - this.goodsAmount;
+        return Double.compare(o.priority, this.priority);
     }
 }

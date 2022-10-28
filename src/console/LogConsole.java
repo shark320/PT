@@ -2,9 +2,11 @@ package console;
 
 import javax.swing.*;
 import javax.swing.text.*;
+import java.util.*;
 import java.awt.*;
-import java.io.OutputStream;
-import java.io.PrintStream;
+import java.util.Timer;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
@@ -14,7 +16,40 @@ import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
  * @author vpavlov
  */
 //TODO Speed up swing console using detached document and thread unlocking
-public class LogConsole extends OutputStream {
+public class LogConsole {
+
+    /**
+     * Inner class represents styled string for java awt StyledDocument
+     *
+     * @author vpavlov
+     */
+    private static final class StyledString {
+        /**
+         * String
+         */
+        public String string;
+
+        /**
+         * Attributes set
+         */
+        public AttributeSet attributes;
+
+        /**
+         * Constructor
+         *
+         * @param string     string
+         * @param attributes attributes set
+         */
+        public StyledString(String string, AttributeSet attributes) {
+            this.string = string;
+            this.attributes = attributes;
+        }
+    }
+
+    /**
+     * TextPanel update frequency [milliseconds]
+     */
+    private static final long UPDATE_FREQUENCY = 200;
 
     /**
      * Default background color
@@ -62,9 +97,10 @@ public class LogConsole extends OutputStream {
     private final JTextPane textArea = new JTextPane();
 
     /**
-     * Output printer for logs
+     * Output buffer
      */
-    final PrintStream printStream;
+    private final BlockingQueue<StyledString> buffer = new LinkedBlockingQueue<>();
+
 
     /**
      * Constructor
@@ -73,23 +109,61 @@ public class LogConsole extends OutputStream {
         textArea.setBackground(DEFAULT_BG_COLOR);
         textArea.setForeground(DEFAULT_TEXT_COLOR);
         textArea.setFont(DEFAULT_FONT);
+        textArea.setEditable(false);
         JScrollPane scrollPane = new JScrollPane(textArea);
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-        scrollPane.setAutoscrolls(false);
         frame.setLocationRelativeTo(null);
         frame.setSize(700, 300);
         frame.add(scrollPane);
         frame.setTitle("Log Console");
         frame.setVisible(true);
-        printStream = new PrintStream(this);
         frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
+
+        standWithUkraine();
+
+        Timer tm = new Timer();
+        tm.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                repaint();
+            }
+        }, 0, UPDATE_FREQUENCY);
     }
 
-    @Override
-    public void write(int b) {
-        int len = textArea.getDocument().getLength();
-        textArea.setCaretPosition(len);
-        textArea.replaceSelection(String.valueOf((char) b));
+    /**
+     * Print Stand with Ukraine styled header
+     */
+    private void standWithUkraine() {
+
+        println("\t   ###########", Color.BLUE);
+        println("\t   ###########", Color.BLUE);
+        print("\tSTAND WITH ", Color.BLUE);
+        println("UKRAINE", Color.YELLOW);
+        println("\t   ###########", Color.YELLOW);
+        println("\t   ###########", Color.YELLOW);
+        println("\n");
+        repaint();
+    }
+
+    /**
+     * Print all strings from the buffer and repaint the TextPane
+     */
+    private void repaint() {
+        //System.out.println("REPAINT " + buffer.isEmpty());
+        if (!buffer.isEmpty()) {
+            StyledDocument document = textArea.getStyledDocument();
+            textArea.setDocument(new DefaultStyledDocument());
+            while (!buffer.isEmpty()) {
+                StyledString line = buffer.poll();
+                try {
+                    document.insertString(document.getLength(), line.string, line.attributes);
+                } catch (BadLocationException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            textArea.setDocument(document);
+            textArea.setCaretPosition(textArea.getDocument().getLength());
+        }
     }
 
     /**
@@ -98,9 +172,7 @@ public class LogConsole extends OutputStream {
      * @param timestamp timestamp to log
      */
     public void logTimestamp(String timestamp) {
-        setColor(TIMESTAMP_COLOR);
-        printStream.print(timestamp + "\t");
-        resetColor();
+        print(timestamp + "\t", TIMESTAMP_COLOR);
     }
 
     /**
@@ -108,9 +180,8 @@ public class LogConsole extends OutputStream {
      *
      * @param message message to log
      */
-    public void log(String message) {
-        printStream.println(message);
-        printStream.println();
+    public void print(String message) {
+        buffer.add(new StyledString(message, setColor(DEFAULT_TEXT_COLOR)));
     }
 
     /**
@@ -119,11 +190,27 @@ public class LogConsole extends OutputStream {
      * @param message message to log
      * @param color   text color
      */
-    public void log(String message, Color color) {
-        setColor(color);
-        printStream.println(message);
-        printStream.println();
-        resetColor();
+    public void print(String message, Color color) {
+        buffer.add(new StyledString(message, setColor(color)));
+    }
+
+    /**
+     * Print message and new line symbol ('\n')
+     *
+     * @param message message to print
+     */
+    public void println(String message) {
+        print(message + "\n");
+    }
+
+    /**
+     * Print message and new line symbol ('\n') with specified color
+     *
+     * @param message message to print
+     * @param color   color to use
+     */
+    public void println(String message, Color color) {
+        print(message + "\n", color);
     }
 
     /**
@@ -131,21 +218,13 @@ public class LogConsole extends OutputStream {
      *
      * @param color color to set
      */
-    public void setColor(Color color) {
+    private AttributeSet setColor(Color color) {
         StyleContext sc = StyleContext.getDefaultStyleContext();
         AttributeSet aset;
         aset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, color);
-        textArea.setCharacterAttributes(aset, false);
+        //textArea.setCharacterAttributes(aset, false);
+        return aset;
     }
 
-    /**
-     * Reset the console text color to default
-     */
-    public void resetColor() {
-        StyleContext sc = StyleContext.getDefaultStyleContext();
-        AttributeSet aset;
-        aset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, DEFAULT_TEXT_COLOR);
-        textArea.setCharacterAttributes(aset, false);
-    }
 
 }

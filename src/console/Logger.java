@@ -45,6 +45,11 @@ public class Logger {
     private static final Color HELP_TEXT_COLOR = Color.YELLOW;
 
     /**
+     * Text color for debug
+     */
+    private static final Color DEBUG_TEXT_COLOR = Color.BLUE;
+
+    /**
      * Date formatter for timestamps
      */
     private static final DateTimeFormatter DTF = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss.SSS");
@@ -124,7 +129,7 @@ public class Logger {
             throw new UnsupportedOperationException("Console is not connected to the logger.");
         }
         console.logTimestamp(timestamp());
-        console.log(message);
+        console.println(message);
     }
 
     /**
@@ -139,7 +144,7 @@ public class Logger {
             throw new UnsupportedOperationException("Console is not connected to the logger.");
         }
         console.logTimestamp(timestamp());
-        console.log(message, color);
+        console.println(message, color);
     }
 
     /**
@@ -155,13 +160,14 @@ public class Logger {
         }
         console.logTimestamp(timestamp());
         switch (type) {
-            case INFO -> console.log("[INFO] " + message, INFO_TEXT_COLOR);
-            case WARNING -> console.log("[WARN] " + message, WARNING_TEXT_COLOR);
-            case ERROR -> console.log("[ERROR] " + message, ERROR_TEXT_COLOR);
-            case HEADER -> console.log(message, HEADER_TEXT_COLOR);
-            case EVENT -> console.log("[EVENT] "+message, EVENT_TEXT_COLOR);
-            case HELP_INFO -> console.log("[HELP] "+message, HELP_TEXT_COLOR);
-            default -> console.log(message, INFO_TEXT_COLOR);
+            case INFO -> console.println("[INFO] " + message, INFO_TEXT_COLOR);
+            case WARNING -> console.println("[WARN] " + message, WARNING_TEXT_COLOR);
+            case ERROR -> console.println("[ERROR] " + message, ERROR_TEXT_COLOR);
+            case HEADER -> console.println(message, HEADER_TEXT_COLOR);
+            case EVENT -> console.println("[EVENT] "+message, EVENT_TEXT_COLOR);
+            case HELP_INFO -> console.println("[HELP] "+message, HELP_TEXT_COLOR);
+            case DEBUG -> console.println("[DEBUG] "+message, DEBUG_TEXT_COLOR);
+            default -> console.println(message, INFO_TEXT_COLOR);
         }
     }
 

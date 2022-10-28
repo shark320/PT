@@ -69,17 +69,24 @@ public class Simulation {
      */
     private final long startTime = System.currentTimeMillis();
 
+    private boolean isCrashed = false;
+
     /**
      * Constructor
      *
      * @param params -parameters of the simulation
      */
     public Simulation(String[] params, Logger logger) {
+        logger.log("Simulation building..", LogType.DEBUG);
+
         this.logger = logger;
         eventLogger = new EventLogger(logger);
         int i = 0;
         int warehouseCount = Integer.parseInt(params[i++]);
         List<Point> points = new ArrayList<>();
+
+        logger.log("Adding warehouses", LogType.DEBUG);
+
         for (int j = 0; j < warehouseCount; ++j) {
             Warehouse w = new Warehouse(
                     j,
@@ -93,6 +100,10 @@ public class Simulation {
             warehouses.add(w);
             warehouseSupplies.add(new WarehouseSupply(w));
         }
+
+        logger.log("Warehouses has been added", LogType.DEBUG);
+        logger.log("Adding oases", LogType.DEBUG);
+
         int oasesCount = Integer.parseInt(params[i++]);
         for (int j = 0; j < oasesCount; ++j) {
             Oasis o = new Oasis(
@@ -103,14 +114,19 @@ public class Simulation {
             points.add(o.getLocation());
             oases.add(o);
         }
+        logger.log("Oases has been added", LogType.DEBUG);
+        logger.log("Adding paths", LogType.DEBUG);
 
-        map = new MapGraph(points, camelTypes, warehouseCount);
+        map = new MapGraph(points, camelTypes, warehouses);
         this.roadsCount = Integer.parseInt(params[i++]);
         for (int j = 0; j < this.roadsCount; ++j) {
             int p1 = Integer.parseInt(params[i++]) - 1;
             int p2 = Integer.parseInt(params[i++]) - 1;
             map.addBidirectionalEdge(p1, p2);
         }
+
+        logger.log("Paths has been added", LogType.DEBUG);
+        logger.log("Adding camel types", LogType.DEBUG);
 
         int camelsCount = Integer.parseInt(params[i++]);
 
@@ -128,6 +144,9 @@ public class Simulation {
             camelTypes.add(c);
         }
 
+        logger.log("Camel types has been added", LogType.DEBUG);
+        logger.log("Adding requests", LogType.DEBUG);
+
         //map.calculateEffectivePaths(warehouseCount, camelTypes);
 
         //map.calculatePaths(warehouseCount);
@@ -142,23 +161,10 @@ public class Simulation {
             );
             requests.add(r);
         }
+        logger.log("Request has been added", LogType.DEBUG);
+
+        logger.log("Simulation has been built", LogType.DEBUG);
     }
-
-
-    public void showPath(int oasisId) {
-        PriorityQueue<Path> pathList = map.getPathsForOasis(oasisId);
-        for (Path path : pathList) {
-            System.out.println(path);
-        }
-    }
-
-    public void showPaths() {
-        for (int i = warehouses.size(); i < warehouses.size() + oases.size(); ++i) {
-            showPath(i);
-            System.out.println();
-        }
-    }
-
 
     /**
      * Supply all warehouses
@@ -259,17 +265,31 @@ public class Simulation {
     /**
      * Find fitting path and camel type for the request
      *
-     * @param paths   all paths from the requests oasis
+     * @param pathGetter   path getter for the oasis
      * @param goods   goods to deliver
      * @param timeout time for pass the path
      * @return fitting path, fitting camel type and minimal possible speed to pass the path
      */
-    private PathCamelType getRequestFirCamelType(PriorityQueue<Path> paths, int goods, double timeout) throws NoGoodsException {
-        PathCamelType fitCamelType;
-        for (Path path : paths) {
-            fitCamelType = getFitCamelType(path, goods, timeout);
-            if (fitCamelType != null) {
-                return fitCamelType;
+    private PathCamelType getRequestFitCamelType(IOasisPathsGetter pathGetter, int goods, double timeout) throws NoGoodsException {
+        PathCamelType fitCamelType = null;
+        PriorityQueue<Path> paths;
+        Iterator<Path> it;
+        while (pathGetter.hasNext()) {
+            paths = pathGetter.getNextPaths();
+            if (paths != null) {
+                it = paths.iterator();
+                for (Path path : paths) {
+                    try {
+                        fitCamelType = getFitCamelType(path, goods, timeout);
+                    }catch (NoGoodsException e) {
+                        if (!it.hasNext() && !pathGetter.hasNext()){
+                            throw e;
+                        }
+                    }
+                    if (fitCamelType != null) {
+                        return fitCamelType;
+                    }
+                }
             }
         }
         return null;
@@ -446,12 +466,12 @@ public class Simulation {
      */
     private PathCamel camelPrepare(Request request) throws NoGoodsException {
         int oasisId = request.getOasisId() + warehouses.size() - 1;
-        PriorityQueue<Path> paths = map.getPathsForOasis(oasisId);
+        IOasisPathsGetter pathsGetter = map.getPathsForOasis(oasisId);
         PathCamelType fitCamelType;
         Camel camel;
         Iterator<Camel> iterator;
         Warehouse w;
-        fitCamelType = getRequestFirCamelType(paths, request.getGoodsCount(), request.getTimeout());
+        fitCamelType = getRequestFitCamelType(pathsGetter, request.getGoodsCount(), request.getTimeout());
         if (fitCamelType == null) {
             return null;
         }
@@ -505,7 +525,6 @@ public class Simulation {
      */
     public void simulate() {
         double nextSupply;
-        boolean isCrashed = false;
         while (!requests.isEmpty()) {
             nextSupply = Double.POSITIVE_INFINITY;
             List<Request> actualRequests = getActualRequests();
@@ -522,7 +541,6 @@ public class Simulation {
             }
             eventLogger.log(currentTime);
             for (Request request : actualRequests) {
-                System.out.println(request);
                 try {
                     if (!computeRequest(request, currentTime)) {
                         simulationCrashed(request, currentTime);
@@ -595,9 +613,10 @@ public class Simulation {
      * Calculate simulation time
      */
     private void simulationEnd() {
+        String result = isCrashed?"FAILED":"SUCCESS";
         double elapsed = (System.currentTimeMillis() - startTime) / 1e3;
         logger.log(
-                String.format("Simulation ended in %f seconds", elapsed),
+                String.format("Simulation ended in %f seconds. Result: %s", elapsed,result),
                 HEADER
         );
     }

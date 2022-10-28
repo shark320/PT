@@ -37,6 +37,11 @@ public enum LogType {
     HELP_INFO,
 
     /**
+     * Debug tag
+     */
+    DEBUG,
+
+    /**
      * Default tag
      */
     DEFAULT

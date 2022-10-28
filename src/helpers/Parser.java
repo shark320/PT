@@ -3,6 +3,8 @@ package helpers;
 import java.io.*;
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * Abstract file parser class
@@ -19,10 +21,12 @@ public abstract class Parser {
      */
     private static String getData(File file) {
         StringBuilder out = new StringBuilder();
+        Stream<String> lines;
         try (BufferedReader input = new BufferedReader(new InputStreamReader(new FileInputStream(file)))) {
-            int c;
-            while (input.ready()) {
-                out.append(input.readLine()).append(" ");
+            lines = input.lines();
+            List<String> list = lines.toList();
+            for (String line: list){
+                out.append(line).append(" ");
             }
         } catch (IOException e) {
             throw new RuntimeException(e);

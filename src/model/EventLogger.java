@@ -1,24 +1,50 @@
 package model;
 
-import console.LogType;
 import console.Logger;
 
 import java.util.PriorityQueue;
 
+/**
+ * Logs simulation events
+ *
+ * @author vpavlov
+ */
 public class EventLogger {
 
+    /**
+     * Simulation events priority queue
+     */
     private final PriorityQueue<Event> events = new PriorityQueue<>();
 
+    /**
+     * File and console logger
+     */
     private final Logger logger;
 
+    /**
+     * Constructor
+     *
+     * @param logger file and console logger
+     */
     public EventLogger(Logger logger) {
         this.logger = logger;
     }
 
-    public void addEvent(double time, String message) throws IllegalStateException {
-        events.add(new Event(time, message));
+    /**
+     * Add new simulation event to log
+     *
+     * @param time    simulation time
+     * @param message event message
+     */
+    public void addEvent(double time, String message) {
+        events.add(new Event(time, System.currentTimeMillis(), message));
     }
 
+    /**
+     * Logs all events with specified time or earlier
+     *
+     * @param time event time to log
+     */
     public void log(double time) {
         Event event;
         for (; ; ) {
@@ -28,8 +54,8 @@ public class EventLogger {
             }
             if (event.getTime() <= time) {
                 events.poll();
-                logger.log(event.getMessage(), LogType.EVENT);
-                //System.out.println(event.getMessage());
+                //logger.log(event.getMessage(), LogType.EVENT);
+                System.out.println(event.getMessage());
             } else {
                 break;
             }
@@ -44,12 +70,15 @@ public class EventLogger {
         }
     }
 
+    /**
+     * Logs all events from queue
+     */
     public void logAll() {
         Event event;
         while (!events.isEmpty()) {
             event = events.poll();
-            logger.log(event.getMessage(), LogType.EVENT);
-            //System.out.println(event.getMessage());
+            //logger.log(event.getMessage(), LogType.EVENT);
+            System.out.println(event.getMessage());
         }
     }
 }

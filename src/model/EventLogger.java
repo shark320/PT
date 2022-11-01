@@ -1,7 +1,9 @@
 package model;
 
+import console.LogType;
 import console.Logger;
 
+import java.util.Arrays;
 import java.util.PriorityQueue;
 
 /**
@@ -38,6 +40,143 @@ public class EventLogger {
      */
     public void addEvent(double time, String message) {
         events.add(new Event(time, System.currentTimeMillis(), message));
+    }
+
+    //TODO: comments
+    public void addCamelArriveEvent(Object... values) throws IllegalArgumentException{
+        try{
+            double time = (double)values[0];
+            int camelId = (int)values[1];
+            int oasisId = (int)values[2];
+            int goods = (int)values[3];
+            double prepareTime = (double)values[4];
+            double timeout = (double)values[5];
+            this.addEvent(
+                    time,
+                    String.format(
+                            "Cas: %d, Velbloud: %d, oasa: %d, Vylozeno kosu: %d, Vylozeno v: %d, Casova rezerva: %d",
+                            Math.round(time),
+                            camelId,
+                            oasisId,
+                            goods,
+                            Math.round(time + prepareTime),
+                            Math.round(timeout - (time + prepareTime))
+                    )
+            );
+        }catch(Exception e){
+            throw new IllegalArgumentException("Bad event arguments: "+ Arrays.toString(values));
+        }
+    }
+
+    //TODO: comments
+    public void addCamelIgnoreEvent(Object... values) throws IllegalArgumentException{
+        try{
+            double time = (double)values[0];
+            int camelId = (int)values[1];
+            int pointId = (int)values[2];
+            this.addEvent(
+                    time,
+                    String.format(
+                            "Cas: %d, Velbloud: %d, oasa: %d, Kuk na velblouda",
+                            Math.round(time),
+                            camelId,
+                            pointId
+                    )
+            );
+        }catch(Exception e){
+            throw new IllegalArgumentException("Bad event arguments: "+ Arrays.toString(values));
+        }
+    }
+
+    public void addCamelReturnEvent(Object... values) throws IllegalArgumentException{
+        try{
+            double time = (double)values[0];
+            int camelId = (int)values[1];
+            int warehouseId = (int)values[2];
+            this.addEvent(
+                    time,
+                    String.format(
+                            "Cas: %d, Velbloud: %d, Navrat do skladu: %d",
+                            Math.round(time),
+                            camelId,
+                            warehouseId
+                    ));
+        }catch(Exception e){
+            throw new IllegalArgumentException("Bad event arguments: "+ Arrays.toString(values));
+        }
+    }
+
+    //TODO: comments
+    public void addCamelDrinkEvent(DrinkType type,Object... values) throws IllegalArgumentException{
+        try{
+            String drinkPlace = "";
+            double time = (double)values[0];
+            int camelId = (int)values[1];
+            int pointId = (int)values[2];
+            String camelType = (String)values[3];
+            double drinkTime = (double)values[4];
+            switch(type){
+                case OASIS -> drinkPlace = "Oasa";
+                case WAREHOUSE -> drinkPlace = "Sklad";
+            }
+            this.addEvent(
+                    time,
+                    String.format(
+                            "Cas: %d, Velbloud: %d, %s: %d, Ziznivy: %s, Pokracovani mozne v: %d",
+                            Math.round(time),
+                            camelId,
+                            drinkPlace,
+                            pointId,
+                            camelType,
+                            Math.round(time + drinkTime)
+                    )
+            );
+        }catch(Exception e){
+            throw new IllegalArgumentException("Bad event arguments: "+ Arrays.toString(values));
+        }
+    }
+
+    //TODO: comments
+    public void addCamelLoadEvent(Object... values) throws IllegalArgumentException{
+        try{
+            double time = (double)values[0];
+            int camelId = (int)values[1];
+            int warehouseId = (int)values[2];
+            int goods = (int)values[3];
+            double prepareTime = (double)values[4];
+            this.addEvent(
+                    time,
+                    String.format(
+                            "Cas: %d, Velbloud: %d, Sklad: %d, Nalozeno kosu: %d, Odchod v: %d",
+                            Math.round(time),
+                            camelId,
+                            warehouseId,
+                            goods,
+                            Math.round(time + prepareTime)
+                    )
+            );
+        }catch(Exception e){
+            throw new IllegalArgumentException("Bad event arguments: "+ Arrays.toString(values));
+        }
+    }
+
+    //TODO: comments
+    public void addWarehouseSupplyEvent(Object... values) throws IllegalArgumentException{
+        try{
+            double time = (double)values[0];
+            int warehouseId = (int)values[1];
+            int goods = (int)values[2];
+            this.addEvent(
+                    time,
+                    String.format(
+                            "Cas: %d, Sklad: %d, Doslo k doplneni skladu o %d kosu",
+                            Math.round(time),
+                            warehouseId,
+                            goods
+                    ));
+        }catch(Exception e){
+            throw new IllegalArgumentException("Bad event arguments: "+ Arrays.toString(values));
+        }
     }
 
     /**

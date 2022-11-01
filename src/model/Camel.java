@@ -34,6 +34,7 @@ public class Camel implements Comparable<Camel>{
      */
     private final double distance;
 
+    //TODO: comments
     private final int warehouseId;
 
     private double returnTime = -1;
@@ -52,7 +53,7 @@ public class Camel implements Comparable<Camel>{
         //distance random generating (Normal distribution)
         double deviation = type.getDistanceDeviation();
         double mean = type.getDistanceMean();
-        this.distance = rand.nextDouble() * deviation + mean;
+        this.distance = rand.nextGaussian() * deviation + mean;
         this.warehouseId = warehouseId;
     }
 

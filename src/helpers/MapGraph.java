@@ -32,7 +32,7 @@ public class MapGraph {
         /**
          * Path for the oasis
          */
-        private final HashMap<Warehouse, PriorityQueue<Path>> oasisPaths;
+        private HashMap<Warehouse, PriorityQueue<Path>> oasisPaths;
 
         /**
          * Constructor
@@ -41,12 +41,17 @@ public class MapGraph {
          * @throws IllegalArgumentException if oasis id is out of bounds
          */
         OasisPathsGetter(int oasisId) throws IllegalArgumentException {
+            //System.out.printf("[DEBUG] PathGetter: oasisId=%d\n", oasisId);
             if (oasisId < warehouses.size()) {
                 throw new IllegalArgumentException(String.format("Illegal oasis id %d. Oasis id should be in [%d,%d]", oasisId, warehouseCount, graph.size() - 1));
             }
             warehouses.sort(null);
             this.oasisId = oasisId;
             oasisPaths = paths.get(oasisId);
+            if (oasisPaths == null) {
+                oasisPaths = new HashMap<>();
+                paths.put(oasisId, oasisPaths);
+            }
         }
 
         @Override
@@ -60,9 +65,17 @@ public class MapGraph {
                 throw new NoSuchElementException("Oasis has no next paths");
             }
             Warehouse warehouse = warehouses.get(currentWarehouse);
+
+            //System.out.printf("[DEBUG] Warehouse %d goods=%d priority=%.2f\n",warehouse.getId(), warehouse.getGoodsAmount(), warehouse.getPriority());
             PriorityQueue<Path> pathsQueue = oasisPaths.get(warehouse);
             if (pathsQueue == null) {
                 pathsQueue = findEffectivePaths(oasisId, warehouse.getId());
+//                if (warehouse.getId()==2){
+//                    System.out.println("TEST");
+//                    System.out.println(warehouseCount);
+//                    System.out.println(oasisId);
+//                }
+                //System.out.printf("[DEBUG] oasisId=%d\n %s\n",oasisId,pathsQueue);
                 oasisPaths.put(warehouse, pathsQueue);
             }
             ++currentWarehouse;
@@ -103,26 +116,27 @@ public class MapGraph {
      * @param points -graph vertexes
      */
     public MapGraph(List<Point> points, PriorityQueue<CamelType> camelTypes, List<Warehouse> warehouses) {
-        graph = new ArrayList<>(points.size());
-        for (Point p : points) {
-            graph.add(new GraphEntity(p));
-        }
-        this.camelTypes = camelTypes;
-        this.warehouses = new ArrayList<>(warehouses);
-        this.warehouseCount = warehouses.size();
-        initPaths();
+            graph = new ArrayList<>(points.size());
+            for (Point p : points) {
+                graph.add(new GraphEntity(p));
+            }
+            this.camelTypes = camelTypes;
+            this.warehouses = new ArrayList<>(warehouses);
+            this.warehouseCount = warehouses.size();
+            initPaths();
     }
 
     /**
      * Initializes paths map with warehouses and null paths sets
      */
     private void initPaths() {
-        HashMap<Warehouse, PriorityQueue<Path>> oasisPaths = new HashMap<>();
+//        HashMap<Warehouse, PriorityQueue<Path>> oasisPaths;
         for (int i = warehouseCount; i < graph.size(); i++) {
-            for (Warehouse w : warehouses) {
-                oasisPaths.put(w, null);
-            }
-            paths.put(i, oasisPaths);
+//            oasisPaths = new HashMap<>();
+//            for (Warehouse w : warehouses) {
+//                oasisPaths.put(w, null);
+//            }
+            paths.put(i, null);
         }
     }
 
@@ -308,6 +322,20 @@ public class MapGraph {
      */
     public List<GraphEntity> getGraph() {
         return graph;
+    }
+
+    public void printForOasis(int id){
+        System.out.println(warehouseCount);
+        System.out.println(id);
+        System.out.println(graph.get(id+warehouseCount).neighbours);
+        System.out.println(findEffectivePaths(id+warehouseCount,0));
+        Point p1 = graph.get(id+warehouseCount).point;
+        Point p2 = graph.get(0).point;
+        System.out.printf("[DEBUG] Distance between %d and %d  =  %f",0, id+warehouseCount, Point.getDistance(p1, p2));
+        System.out.println("Camel types:");
+        for (CamelType ct : camelTypes){
+            System.out.println(ct);
+        }
     }
 
     /*

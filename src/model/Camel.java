@@ -39,6 +39,8 @@ public class Camel implements Comparable<Camel>{
 
     private double returnTime = -1;
 
+    private double stamina;
+
     /**
      * Constructor
      * @param type - camelType of Camel
@@ -54,6 +56,7 @@ public class Camel implements Comparable<Camel>{
         double deviation = type.getDistanceDeviation();
         double mean = type.getDistanceMean();
         this.distance = rand.nextGaussian() * deviation + mean;
+        this.stamina = distance;
         this.warehouseId = warehouseId;
     }
 
@@ -83,6 +86,19 @@ public class Camel implements Comparable<Camel>{
 
     public int getId() {
         return id;
+    }
+
+    public double getStamina() {
+        return stamina;
+    }
+
+    public double drink(){
+        stamina = distance;
+        return type.getDrinkTime();
+    }
+
+    public void removeStamina(double toRemove){
+        stamina-= toRemove;
     }
 
     @Override

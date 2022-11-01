@@ -85,7 +85,7 @@ public class Warehouse implements Comparable<Warehouse> {
      * Sets warehouse priority according to loading time and goods amount
      */
     private void setPriority() {
-        priority = supplyAmount / loadingTime * camels.size();
+        priority = goodsAmount / loadingTime;
     }
 
     /**
@@ -260,5 +260,9 @@ public class Warehouse implements Comparable<Warehouse> {
     @Override
     public int compareTo(Warehouse o) {
         return Double.compare(o.priority, this.priority);
+    }
+
+    public double getPriority() {
+        return this.priority;
     }
 }

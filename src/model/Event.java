@@ -81,6 +81,6 @@ public class Event implements Comparable<Event> {
     @Override
     public int compareTo(Event o) {
         int cmpTime = Double.compare(time, o.getTime());
-        return cmpTime == 0d ? cmpTimestamp(o) : cmpTime;
+        return cmpTime == 0 ? cmpTimestamp(o) : cmpTime;
     }
 }

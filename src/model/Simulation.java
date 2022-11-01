@@ -182,14 +182,7 @@ public class Simulation {
             if (warehouseSupply.getNextSupplyTime() <= currentTime) {
                 w = warehouseSupply.warehouse();
                 warehouseSupplies.poll();
-                eventLogger.addEvent(
-                        currentTime,
-                        String.format(
-                                "Cas: %d, Sklad: %d, Doslo k doplneni skladu o %d kosu",
-                                Math.round(currentTime),
-                                w.getId(),
-                                w.supply()
-                        ));
+                eventLogger.addWarehouseSupplyEvent(currentTime, w.getId(), w.supply());
                 warehouseSupplies.add(new WarehouseSupply(w));
             } else {
                 break;
@@ -309,67 +302,17 @@ public class Simulation {
      *
      * @param pathCamel path - camel pair
      * @param start     start time
-     * @param stamina   current stamina
      */
-    private void returnCamelPath(PathCamel pathCamel, double start, double stamina) {
+    private void returnCamelPath(PathCamel pathCamel, double start) {
        // System.out.println("[DEBUG] returnCamelPath");
         Camel camel = pathCamel.camel();
         Path path = pathCamel.path();
-        Warehouse warehouse = warehouses.get(path.getWarehouseId());
         List<Point> points = path.getPoints();
         double time = start;
-        double transitionDistance;
-        double drinkTime = camel.getType().getDrinkTime();
         for (int i = points.size() - 1; i > 0; --i) {
             Point p1 = points.get(i);
             Point p2 = points.get(i - 1);
-            transitionDistance = Point.getDistance(p1, p2);
-            if (stamina < transitionDistance) {
-                if (p1.id() < warehouses.size()) {
-                    //stopped in warehouse
-                    eventLogger.addEvent(
-                            time,
-                            String.format(
-                                    "Cas: %d, Velbloud: %d, Sklad: %d, Ziznivy: %s, Pokracovani mozne v: %d",
-                                    Math.round(time),
-                                    camel.getId(),
-                                    p1.id(),
-                                    camel.getType().getName(),
-                                    Math.round(time + drinkTime)
-                            )
-                    );
-                } else {
-                    //stopped in oasis
-                    eventLogger.addEvent(
-                            time,
-                            String.format(
-                                    "Cas: %d, Velbloud: %d, oasa: %d, Ziznivy: %s, Pokracovani mozne v: %d",
-                                    Math.round(time),
-                                    camel.getId(),
-                                    p1.id(),
-                                    camel.getType().getName(),
-                                    Math.round(time + drinkTime)
-                            )
-                    );
-                }
-
-                time += drinkTime;
-            }else {
-                if (i != path.getWarehouseId()) {
-                    //transit
-                    eventLogger.addEvent(
-                            time,
-                            String.format(
-                                    "Cas: %d, Velbloud: %d, oasa: %d, Kuk na velblouda",
-                                    Math.round(time),
-                                    camel.getId(),
-                                    p1.id()
-                            )
-                    );
-
-                }
-            }
-            time += transitionDistance / camel.getSpeed();
+            time = pointsTransition(time,path.getOasisId(),p1,p2,camel);
         }
         camel.setReturnTime(time);
         camelsToReturn.add(camel);
@@ -391,9 +334,6 @@ public class Simulation {
         Warehouse warehouse = warehouses.get(path.getWarehouseId());
         List<Point> points = path.getPoints();
         double time = start;
-        double stamina = camel.getDistance();
-        double transitionDistance;
-        double drinkTime = camel.getType().getDrinkTime();
         double loadingTime = warehouse.getLoadingTime();
         int maxLoad = camel.getType().getMaxLoad();
         int prepareGoods = Math.min(goods, maxLoad);
@@ -402,17 +342,7 @@ public class Simulation {
         warehouse.removeGoods(prepareGoods);
 
         //preparing camel
-        eventLogger.addEvent(
-                time,
-                String.format(
-                        "Cas: %d, Velbloud: %d, Sklad: %d, Nalozeno kosu: %d, Odchod v: %d",
-                        Math.round(time),
-                        camel.getId(),
-                        warehouse.getId(),
-                        prepareGoods,
-                        Math.round(time + prepareTime)
-                )
-        );
+        eventLogger.addCamelLoadEvent(time,camel.getId(),warehouse.getId(),prepareGoods,prepareTime);
 
         time += prepareTime;
 
@@ -420,69 +350,35 @@ public class Simulation {
         for (int i = 0; i < points.size() - 1; i++) {
             Point p1 = points.get(i);
             Point p2 = points.get(i + 1);
-            transitionDistance = Point.getDistance(p1, p2);
-            if (stamina < transitionDistance) {
-                if (p1.id() < warehouses.size()) {
-                    //stopped in warehouse
-                    eventLogger.addEvent(
-                            time,
-                            String.format(
-                                    "Cas: %d, Velbloud: %d, Sklad: %d, Ziznivy: %s, Pokracovani mozne v: %d",
-                                    Math.round(time),
-                                    camel.getId(),
-                                    p1.id(),
-                                    camel.getType().getName(),
-                                    Math.round(time + drinkTime)
-                            )
-                    );
-                } else {
-                    //stopped in oasis
-                    eventLogger.addEvent(
-                            time,
-                            String.format(
-                                    "Cas: %d, Velbloud: %d, oasa: %d, Ziznivy: %s, Pokracovani mozne v: %d",
-                                    Math.round(time),
-                                    camel.getId(),
-                                    p1.id(),
-                                    camel.getType().getName(),
-                                    Math.round(time + drinkTime)
-                            )
-                    );
-                }
-                time += drinkTime;
-            } else {
-                if (i != path.getWarehouseId()) {
-                    //transit
-                    eventLogger.addEvent(
-                            time,
-                            String.format(
-                                    "Cas: %d, Velbloud: %d, oasa: %d, Kuk na velblouda",
-                                    Math.round(time),
-                                    camel.getId(),
-                                    p1.id()
-                            )
-                    );
-
-                }
-            }
-            time += transitionDistance / camel.getSpeed();
+            time = pointsTransition(time,path.getWarehouseId(),p1,p2,camel);
         }
 
-        eventLogger.addEvent(
-                time,
-                String.format(
-                        "Cas: %d, Velbloud: %d, oasa: %d, Vylozeno kosu: %d, Vylozeno v: %d, Casova rezerva: %d",
-                        Math.round(time),
-                        camel.getId(),
-                        path.getOasisId(),
-                        prepareGoods,
-                        Math.round(time + prepareTime),
-                        Math.round(timeout - (time + prepareTime))
-                )
-        );
-        returnCamelPath(pathCamel, time, stamina);
-        //TODO: increment request goods
+        eventLogger.addCamelArriveEvent(time, camel.getId(), path.getOasisId(),prepareGoods, prepareTime, timeout);
+
+        returnCamelPath(pathCamel, time);
         return prepareGoods;
+    }
+
+    private double pointsTransition(double time,int startId, Point p1, Point p2, Camel camel){
+        double transitionDistance = Point.getDistance(p1, p2);
+        double drinkTime = camel.getType().getDrinkTime();
+        if (Double.compare(camel.getStamina(), transitionDistance)<0) {
+            if (p1.id() < warehouses.size()) {
+                //stopped in warehouse
+                eventLogger.addCamelDrinkEvent(DrinkType.WAREHOUSE, time,camel.getId(),p1.id(),camel.getType().getName(),drinkTime);
+            } else {
+                //stopped in oasis
+                eventLogger.addCamelDrinkEvent(DrinkType.OASIS, time,camel.getId(),p1.id(),camel.getType().getName(),drinkTime);
+            }
+            time += camel.drink();
+        } else {
+            if (p1.id() != startId) {
+                //transit
+                eventLogger.addCamelIgnoreEvent(time,camel.getId(),p1.id());
+            }
+        }
+        time+=(transitionDistance / camel.getSpeed());
+        return time;
     }
 
     /**
@@ -537,7 +433,7 @@ public class Simulation {
                 return false;
             }
             try {
-                goods -= computePathForCamel(pathCamel, goods, currentTime, currentTime + request.getTimeout());
+                goods -= computePathForCamel(pathCamel, goods, currentTime, request.getTime() + request.getTimeout());
             }catch (NoGoodsException e){
                 request.setGoodsCount(goods);
                 throw e;
@@ -640,15 +536,7 @@ public class Simulation {
             }
             if (camel.getReturnTime() <= currentTime) {
                 camelsToReturn.poll();
-
-                eventLogger.addEvent(
-                        camel.getReturnTime(),
-                        String.format(
-                                "Cas: %d, Velbloud: %d, Navrat do skladu: %d",
-                                Math.round(camel.getReturnTime()),
-                                camel.getId(),
-                                camel.getWarehouseId()
-                        ));
+                eventLogger.addCamelReturnEvent(camel.getReturnTime(), camel.getId(),camel.getWarehouseId());
                 warehouses.get(camel.getWarehouseId()).returnCamel(camel);
             } else {
                 break;

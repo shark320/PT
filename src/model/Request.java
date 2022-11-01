@@ -40,7 +40,7 @@ public class Request implements Comparable<Request> {
     /**
      * Amount of goods {kp}
      */
-    private final int goodsCount;
+    private int goodsCount;
 
     /**
      * Constructor
@@ -83,6 +83,10 @@ public class Request implements Comparable<Request> {
      */
     public int getOasisId() {
         return oasisId;
+    }
+
+    public void setGoodsCount(int goodsCount) {
+        this.goodsCount = goodsCount;
     }
 
     /**

@@ -209,6 +209,7 @@ public class Simulation {
      * If it's negative then camel cannot pass
      */
     private double computePathForCamelType(Warehouse w, Path path, CamelType type, int goods, double timeout) {
+        //System.out.println("[DEBUG] computePathForCamelType");
         List<Point> points = path.getPoints();
         double stamina = type.getEffectiveDistance();
         double transitionDistance;
@@ -224,7 +225,9 @@ public class Simulation {
             }
             stamina -= transitionDistance;
         }
-        //TODO problem when timeout == time
+        if (Double.compare(timeout, time)<=0){
+            return Double.POSITIVE_INFINITY;
+        }
         minPossibleSpeed = path.getDistance() / (timeout - time);
         return minPossibleSpeed;
     }
@@ -238,6 +241,7 @@ public class Simulation {
      * @return path, fitting camel type and minimal possible speed to pass the path
      */
     private PathCamelType getFitCamelType(Path path, int goods, double timeout) throws NoGoodsException {
+        //System.out.println("[DEBUG] getFitCamelType");
         double time;
         boolean noGoods = true;
         double minPossibleSpeed;
@@ -271,14 +275,19 @@ public class Simulation {
      * @return fitting path, fitting camel type and minimal possible speed to pass the path
      */
     private PathCamelType getRequestFitCamelType(IOasisPathsGetter pathGetter, int goods, double timeout) throws NoGoodsException {
+        //System.out.println("[DEBUG] getRequestFitCamelType");
         PathCamelType fitCamelType = null;
         PriorityQueue<Path> paths;
         Iterator<Path> it;
         while (pathGetter.hasNext()) {
             paths = pathGetter.getNextPaths();
+//            if (!paths.isEmpty()) {
+//                System.out.println("[DEBUG] getRequestFitCamelType\n" + paths);
+//            }
             if (paths != null) {
                 it = paths.iterator();
-                for (Path path : paths) {
+                while (it.hasNext()) {
+                    Path path = it.next();
                     try {
                         fitCamelType = getFitCamelType(path, goods, timeout);
                     }catch (NoGoodsException e) {
@@ -303,6 +312,7 @@ public class Simulation {
      * @param stamina   current stamina
      */
     private void returnCamelPath(PathCamel pathCamel, double start, double stamina) {
+       // System.out.println("[DEBUG] returnCamelPath");
         Camel camel = pathCamel.camel();
         Path path = pathCamel.path();
         Warehouse warehouse = warehouses.get(path.getWarehouseId());
@@ -344,6 +354,20 @@ public class Simulation {
                 }
 
                 time += drinkTime;
+            }else {
+                if (i != path.getWarehouseId()) {
+                    //transit
+                    eventLogger.addEvent(
+                            time,
+                            String.format(
+                                    "Cas: %d, Velbloud: %d, oasa: %d, Kuk na velblouda",
+                                    Math.round(time),
+                                    camel.getId(),
+                                    p1.id()
+                            )
+                    );
+
+                }
             }
             time += transitionDistance / camel.getSpeed();
         }
@@ -360,7 +384,8 @@ public class Simulation {
      * @param timeout   time for request processing
      * @return amount of goods that left in the request
      */
-    private int computePathForCamel(PathCamel pathCamel, int goods, double start, double timeout) {
+    private int computePathForCamel(PathCamel pathCamel, int goods, double start, double timeout) throws NoGoodsException {
+        //System.out.println("[DEBUG] computePathForCamel");
         Camel camel = pathCamel.camel();
         Path path = pathCamel.path();
         Warehouse warehouse = warehouses.get(path.getWarehouseId());
@@ -388,6 +413,7 @@ public class Simulation {
                         Math.round(time + prepareTime)
                 )
         );
+
         time += prepareTime;
 
         //road
@@ -455,6 +481,7 @@ public class Simulation {
                 )
         );
         returnCamelPath(pathCamel, time, stamina);
+        //TODO: increment request goods
         return prepareGoods;
     }
 
@@ -465,7 +492,9 @@ public class Simulation {
      * @return fitting path and camel
      */
     private PathCamel camelPrepare(Request request) throws NoGoodsException {
+        //System.out.println("[DEBUG] camelPrepare");
         int oasisId = request.getOasisId() + warehouses.size() - 1;
+        //System.out.println("[DEBUG] OasisId="+oasisId);
         IOasisPathsGetter pathsGetter = map.getPathsForOasis(oasisId);
         PathCamelType fitCamelType;
         Camel camel;
@@ -499,6 +528,7 @@ public class Simulation {
      * @return true if computing was success, else - false
      */
     private boolean computeRequest(Request request, double currentTime) throws NoGoodsException {
+        //System.out.println("[DEBUG] computeRequest");
         int goods = request.getGoodsCount();
         PathCamel pathCamel;
         while (goods > 0) {
@@ -506,11 +536,17 @@ public class Simulation {
             if (pathCamel == null) {
                 return false;
             }
-            goods -= computePathForCamel(pathCamel, goods, currentTime, currentTime + request.getTimeout());
+            try {
+                goods -= computePathForCamel(pathCamel, goods, currentTime, currentTime + request.getTimeout());
+            }catch (NoGoodsException e){
+                request.setGoodsCount(goods);
+                throw e;
+            }
         }
         return true;
     }
 
+    //TODO:comments
     private boolean isSuppliesFirst(double currentTime) {
         WarehouseSupply supplier = warehouseSupplies.peek();
         if (supplier == null) {
@@ -525,7 +561,7 @@ public class Simulation {
      */
     public void simulate() {
         double nextSupply;
-        while (!requests.isEmpty()) {
+        while (!isCrashed && !requests.isEmpty()) {
             nextSupply = Double.POSITIVE_INFINITY;
             List<Request> actualRequests = getActualRequests();
             actualRequests.sort(Request::sortByTimeout);
@@ -541,6 +577,14 @@ public class Simulation {
             }
             eventLogger.log(currentTime);
             for (Request request : actualRequests) {
+//                if(request.getOasisId() == 3){
+//                    System.out.println("------------Oasis 3------------");
+//                    map.printForOasis(2);
+//                    System.out.println(request);
+////                    simulationCrashed(request, currentTime);
+////                    isCrashed = true;
+////                    break;
+//                }
                 try {
                     if (!computeRequest(request, currentTime)) {
                         simulationCrashed(request, currentTime);
@@ -569,14 +613,17 @@ public class Simulation {
     }
 
     private void simulationCrashed(Request request, double currentTime) {
-        logger.log(
-                String.format(
-                        "Cas: %d, Oaza: %d, Vsichni vymreli, Harpagon zkrachoval, Konec simulace",
+//        logger.log(
+//                String.format(
+//                        "Cas: %d, Oaza: %d, Vsichni vymreli, Harpagon zkrachoval, Konec simulace",
+//                        Math.round(currentTime),
+//                        request.getOasisId()
+//                ),
+//                LogType.ERROR
+//        );
+        System.out.printf("[ERROR] Cas: %d, Oaza: %d, Vsichni vymreli, Harpagon zkrachoval, Konec simulace\n",
                         Math.round(currentTime),
-                        request.getOasisId()
-                ),
-                LogType.ERROR
-        );
+                        request.getOasisId());
     }
 
     /**
@@ -617,7 +664,7 @@ public class Simulation {
         double elapsed = (System.currentTimeMillis() - startTime) / 1e3;
         logger.log(
                 String.format("Simulation ended in %f seconds. Result: %s", elapsed,result),
-                HEADER
+                LogType.HEADER
         );
     }
 

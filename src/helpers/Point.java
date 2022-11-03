@@ -65,11 +65,15 @@ public record Point(double x, double y, int id) {
     /**
      * Check if two points are equal (the same X and Y coordinates)
      *
-     * @param p - point to check
+     * @param o - point to check
      * @return true if points are equal, else - false
      */
-    public boolean isEqual(Point p) {
-        return Double.compare(x, p.x) == 0 && Double.compare(y, p.y) == 0;
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof Point p) {
+            return Double.compare(x, p.x) == 0 && Double.compare(y, p.y) == 0;
+        }
+        return false;
     }
 
     @Override

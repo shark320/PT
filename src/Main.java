@@ -1,7 +1,11 @@
-import helpers.Point;
+import console.Logger;
+import helpers.Parser;
+import model.Request;
 import model.Simulation;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.Locale;
 
 
 /**
@@ -17,12 +21,12 @@ public class Main {
      * @param args - program arguments
      * @author vpavlov
      */
-    public static void main(String[] args) {
-        String[] res = Parser.parseFile(new File("test_input.txt"));
-        Simulation simulation = new Simulation(res);
-        System.out.println(simulation.toString());
-        //simulation.generateCamel();
-        //simulation.showPath(0,29);
-        simulation.showPaths();
+    public static void main(String[] args) throws InterruptedException, IOException {
+        Locale.setDefault(Locale.US);
+        String[] res = Parser.parseFile(new File("data_v2/dense_small.txt"));
+        Logger logger = new Logger(true);
+        Simulation simulation = new Simulation(res, logger);
+        simulation.simulate();
+        logger.close();
     }
 }

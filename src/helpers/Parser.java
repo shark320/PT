@@ -25,7 +25,7 @@ public abstract class Parser {
         try (BufferedReader input = new BufferedReader(new InputStreamReader(new FileInputStream(file)))) {
             lines = input.lines();
             List<String> list = lines.toList();
-            for (String line: list){
+            for (String line : list) {
                 out.append(line).append(" ");
             }
         } catch (IOException e) {

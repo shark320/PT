@@ -262,7 +262,4 @@ public class Warehouse implements Comparable<Warehouse> {
         return Double.compare(o.priority, this.priority);
     }
 
-    public double getPriority() {
-        return this.priority;
-    }
 }

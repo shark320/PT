@@ -39,11 +39,6 @@ public enum LogType {
     /**
      * Debug tag
      */
-    DEBUG,
-
-    /**
-     * Default tag
-     */
-    DEFAULT
+    DEBUG
 
 }

@@ -19,6 +19,9 @@ public class Path implements Comparable<Path> {
      */
     private final double distance;
 
+    /**
+     * Maximal transition distance between two points in the path
+     */
     private double maxTransitionDistance = -1;
 
     /**

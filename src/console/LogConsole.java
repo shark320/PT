@@ -15,7 +15,6 @@ import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
  *
  * @author vpavlov
  */
-//TODO Speed up swing console using detached document and thread unlocking
 public class LogConsole {
 
     /**

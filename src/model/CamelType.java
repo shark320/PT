@@ -115,24 +115,6 @@ public class CamelType implements Comparable<CamelType> {
     }
 
     /**
-     * Minimal distance getter
-     *
-     * @return minimal distance
-     */
-    public double getMinDistance() {
-        return minDistance;
-    }
-
-    /**
-     * Maximal distance getter
-     *
-     * @return maximal distance
-     */
-    public double getMaxDistance() {
-        return maxDistance;
-    }
-
-    /**
      * Distance generation deviation getter
      *
      * @return distance deviation

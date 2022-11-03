@@ -1,5 +1,7 @@
 package console;
 
+import helpers.ConsoleColor;
+
 import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -8,11 +10,46 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 /**
- * Provides logging to the log console and log file
+ * Provides logging to the console and log file
  *
  * @author vpavlov
  */
 public class Logger {
+
+    /**
+     * Console color for errors
+     */
+    private static final String ERROR_CONSOLE_COLOR = ConsoleColor.ANSI_RED;
+
+    /**
+     * Console color for warnings
+     */
+    private static final String WARNING_CONSOLE_COLOR = ConsoleColor.ANSI_YELLOW;
+
+    /**
+     * Console color for headers
+     */
+    private static final String HEADER_CONSOLE_COLOR = ConsoleColor.ANSI_GREEN;
+
+    /**
+     * Console color for events
+     */
+    private static final String EVENT_CONSOLE_COLOR = ConsoleColor.ANSI_PURPLE;
+
+    /**
+     * Console color for info
+     */
+    private static final String INFO_CONSOLE_COLOR = ConsoleColor.ANSI_RESET;
+
+    /**
+     * Console color for debug
+     */
+    private static final String DEBUG_CONSOLE_COLOR = ConsoleColor.ANSI_BLUE;
+
+    /**
+     * Console color for timestamps
+     */
+    private static final String TIMESTAMP_CONSOLE_COLOR = ConsoleColor.ANSI_CYAN;
 
     /**
      * Text color for errors
@@ -70,9 +107,11 @@ public class Logger {
      *
      * @throws FileNotFoundException if there is error during file creation
      */
-    public Logger() throws FileNotFoundException {
-        this.file = new PrintWriter("log.txt");
-        this.console = new LogConsole();
+    public Logger(boolean useDefaultConsole) throws FileNotFoundException {
+        this.file = new PrintWriter("simulation_log.log");
+        if (!useDefaultConsole) {
+            this.console = new LogConsole();
+        }
     }
 
     /**
@@ -125,26 +164,13 @@ public class Logger {
      * @throws UnsupportedOperationException if console is not attached (null)
      */
     public void logToConsole(String message) throws UnsupportedOperationException {
-        if (console == null) {
-            throw new UnsupportedOperationException("Console is not connected to the logger.");
+        if (console != null) {
+            console.logTimestamp(timestamp());
+            console.println(message);
+        } else {
+            defaultConsoleTimestamp();
+            printlnToDefaultConsole(message, INFO_CONSOLE_COLOR);
         }
-        console.logTimestamp(timestamp());
-        console.println(message);
-    }
-
-    /**
-     * Log to the console with specified color
-     *
-     * @param message message to log
-     * @param color   specified color
-     * @throws UnsupportedOperationException if console is not attached (null)
-     */
-    public void logToConsole(String message, Color color) throws UnsupportedOperationException {
-        if (console == null) {
-            throw new UnsupportedOperationException("Console is not connected to the logger.");
-        }
-        console.logTimestamp(timestamp());
-        console.println(message, color);
     }
 
     /**
@@ -164,9 +190,9 @@ public class Logger {
             case WARNING -> console.println("[WARN] " + message, WARNING_TEXT_COLOR);
             case ERROR -> console.println("[ERROR] " + message, ERROR_TEXT_COLOR);
             case HEADER -> console.println(message, HEADER_TEXT_COLOR);
-            case EVENT -> console.println("[EVENT] "+message, EVENT_TEXT_COLOR);
-            case HELP_INFO -> console.println("[HELP] "+message, HELP_TEXT_COLOR);
-            case DEBUG -> console.println("[DEBUG] "+message, DEBUG_TEXT_COLOR);
+            case EVENT -> console.println("[EVENT] " + message, EVENT_TEXT_COLOR);
+            case HELP_INFO -> console.println("[HELP] " + message, HELP_TEXT_COLOR);
+            case DEBUG -> console.println("[DEBUG] " + message, DEBUG_TEXT_COLOR);
             default -> console.println(message, INFO_TEXT_COLOR);
         }
     }
@@ -204,6 +230,8 @@ public class Logger {
 
             case EVENT -> file.println(timestamp() + " " + "[EVENT] " + message);
 
+            case DEBUG -> file.println(timestamp() + " " + "[DEBUG] " + message);
+
             default -> file.println(timestamp() + "  " + message);
 
         }
@@ -218,19 +246,87 @@ public class Logger {
      * @param logType logging tag
      * @throws UnsupportedOperationException if both outputs are not connected.
      */
-    public void log(String message, LogType logType) throws UnsupportedOperationException {
-        boolean success = false;
+    public void log(String message, LogType logType) {
         if (file != null) {
             logToFile(message, logType);
-            success = true;
         }
         if (console != null) {
             logToConsole(message, logType);
-            success = true;
+        } else {
+            logToDefaultConsole(message, logType);
         }
-        if (!success) {
-            throw new UnsupportedOperationException("Console and file are not connected to the logger.");
+    }
+
+    /**
+     * Print line without '\n' symbol to the default console with specified color and color reset.
+     *
+     * @param message message to print
+     * @param color   color to message print with
+     */
+    private void printToDefaultConsole(String message, String color) {
+        System.out.print(color + message + ConsoleColor.ANSI_RESET);
+    }
+
+    /**
+     * Print line with '\n' symbol to the default console with specified color and color reset.
+     *
+     * @param message message to print
+     * @param color   color to message print with
+     */
+    private void printlnToDefaultConsole(String message, String color) {
+        System.out.println(color + message + ConsoleColor.ANSI_RESET);
+    }
+
+    /**
+     * Log a message to the default console
+     *
+     * @param message message to log
+     * @param type    log tag
+     */
+    private void logToDefaultConsole(String message, LogType type) {
+        switch (type) {
+            case INFO -> {
+                defaultConsoleTimestamp();
+                printlnToDefaultConsole("[INFO] " + message, INFO_CONSOLE_COLOR);
+            }
+
+            case WARNING -> {
+                defaultConsoleTimestamp();
+                printlnToDefaultConsole("[WARNING] " + message, WARNING_CONSOLE_COLOR);
+            }
+
+            case ERROR -> {
+                defaultConsoleTimestamp();
+                printlnToDefaultConsole("[ERROR] " + message, ERROR_CONSOLE_COLOR);
+            }
+
+            case DEBUG -> {
+                defaultConsoleTimestamp();
+                printlnToDefaultConsole("[DEBUG] " + message, DEBUG_CONSOLE_COLOR);
+            }
+
+            case EVENT -> {
+                defaultConsoleTimestamp();
+                printlnToDefaultConsole("[EVENT] " + message, EVENT_CONSOLE_COLOR);
+            }
+
+            case HEADER -> {
+                printlnToDefaultConsole(message, HEADER_CONSOLE_COLOR);
+            }
+
+            default -> {
+                defaultConsoleTimestamp();
+                printlnToDefaultConsole(message, INFO_CONSOLE_COLOR);
+            }
+
         }
+    }
+
+    /**
+     * Print timestamp to the default console
+     */
+    private void defaultConsoleTimestamp() {
+        printToDefaultConsole(timestamp() + "\t", TIMESTAMP_CONSOLE_COLOR);
     }
 
     /**

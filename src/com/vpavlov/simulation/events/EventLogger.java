@@ -1,7 +1,7 @@
-package model;
+package com.vpavlov.simulation.events;
 
-import console.LogType;
-import console.Logger;
+import com.vpavlov.console.LogType;
+import com.vpavlov.console.Logger;
 
 import java.util.Arrays;
 import java.util.PriorityQueue;
@@ -19,14 +19,14 @@ public class EventLogger {
     private final PriorityQueue<Event> events = new PriorityQueue<>();
 
     /**
-     * File and console logger
+     * File and com.vpavlov.console logger
      */
     private final Logger logger;
 
     /**
      * Constructor
      *
-     * @param logger file and console logger
+     * @param logger file and com.vpavlov.console logger
      */
     public EventLogger(Logger logger) {
         this.logger = logger;

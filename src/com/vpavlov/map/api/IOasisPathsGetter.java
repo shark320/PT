@@ -1,4 +1,6 @@
-package helpers;
+package com.vpavlov.map.api;
+
+import com.vpavlov.map.Path;
 
 import java.util.NoSuchElementException;
 import java.util.PriorityQueue;

@@ -1,6 +1,7 @@
-package helpers;
+package com.vpavlov.simulation.helpers;
 
-import model.Camel;
+import com.vpavlov.map.Path;
+import com.vpavlov.simulation.model.Camel;
 
 /**
  * Record represents pair Camel - Path

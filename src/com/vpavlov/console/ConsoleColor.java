@@ -1,4 +1,4 @@
-package helpers;
+package com.vpavlov.console;
 
 /**
  * Console color constants
@@ -8,7 +8,7 @@ package helpers;
 public abstract class ConsoleColor {
 
     /**
-     * Default console color
+     * Default com.vpavlov.console color
      */
     public static final String ANSI_RESET = "\u001B[0m";
 

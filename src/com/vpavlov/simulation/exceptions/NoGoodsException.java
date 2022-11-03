@@ -1,4 +1,4 @@
-package helpers;
+package com.vpavlov.simulation.exceptions;
 
 /**
  * Exception for setup when all warehouses do not have enough goods for the request

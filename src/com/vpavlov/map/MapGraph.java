@@ -1,7 +1,8 @@
-package helpers;
+package com.vpavlov.map;
 
-import model.CamelType;
-import model.Warehouse;
+import com.vpavlov.map.api.IOasisPathsGetter;
+import com.vpavlov.simulation.model.CamelType;
+import com.vpavlov.simulation.model.Warehouse;
 
 import java.util.*;
 

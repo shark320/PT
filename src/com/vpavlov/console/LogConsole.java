@@ -1,4 +1,4 @@
-package console;
+package com.vpavlov.console;
 
 import javax.swing.*;
 import javax.swing.text.*;
@@ -11,7 +11,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
 /**
- * Log console in a special window with multiply colors logs
+ * Log com.vpavlov.console in a special window with multiply colors logs
  *
  * @author vpavlov
  */
@@ -166,7 +166,7 @@ public class LogConsole {
     }
 
     /**
-     * Logs a timestamp to the console
+     * Logs a timestamp to the com.vpavlov.console
      *
      * @param timestamp timestamp to log
      */
@@ -175,7 +175,7 @@ public class LogConsole {
     }
 
     /**
-     * Log a message to the console
+     * Log a message to the com.vpavlov.console
      *
      * @param message message to log
      */
@@ -184,7 +184,7 @@ public class LogConsole {
     }
 
     /**
-     * Log a message to the console with specified color
+     * Log a message to the com.vpavlov.console with specified color
      *
      * @param message message to log
      * @param color   text color
@@ -213,7 +213,7 @@ public class LogConsole {
     }
 
     /**
-     * Set the console text color
+     * Set the com.vpavlov.console text color
      *
      * @param color color to set
      */

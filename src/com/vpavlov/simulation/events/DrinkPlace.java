@@ -1,4 +1,4 @@
-package model;
+package com.vpavlov.simulation.events;
 
 /**
  * Class represents a camel drink place

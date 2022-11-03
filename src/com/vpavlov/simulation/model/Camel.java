@@ -1,4 +1,4 @@
-package model;
+package com.vpavlov.simulation.model;
 
 import java.util.Random;
 

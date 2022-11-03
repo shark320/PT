@@ -1,4 +1,4 @@
-package console;
+package com.vpavlov.console;
 
 /**
  * Logging tag

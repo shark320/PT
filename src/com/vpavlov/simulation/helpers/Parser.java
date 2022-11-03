@@ -1,4 +1,4 @@
-package helpers;
+package com.vpavlov.simulation.helpers;
 
 import java.io.*;
 import java.util.Deque;

@@ -1,6 +1,6 @@
-package model;
+package com.vpavlov.simulation.model;
 
-import helpers.Point;
+import com.vpavlov.map.Point;
 
 import java.util.*;
 

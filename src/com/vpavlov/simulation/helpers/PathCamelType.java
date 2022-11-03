@@ -1,6 +1,7 @@
-package helpers;
+package com.vpavlov.simulation.helpers;
 
-import model.CamelType;
+import com.vpavlov.map.Path;
+import com.vpavlov.simulation.model.CamelType;
 
 /**
  * Record fitting CamelType to pass the Path and specifies minimal Speed

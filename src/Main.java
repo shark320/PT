@@ -1,7 +1,6 @@
-import console.Logger;
-import helpers.Parser;
-import model.Request;
-import model.Simulation;
+import com.vpavlov.console.Logger;
+import com.vpavlov.simulation.helpers.Parser;
+import com.vpavlov.simulation.model.Simulation;
 
 import java.io.File;
 import java.io.IOException;

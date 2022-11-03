@@ -1,4 +1,4 @@
-package helpers;
+package com.vpavlov.map;
 
 /**
  * Class encapsulates X and Y map coordinates

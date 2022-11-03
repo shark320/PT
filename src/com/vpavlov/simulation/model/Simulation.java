@@ -1,9 +1,17 @@
-package model;
+package com.vpavlov.simulation.model;
 
-import console.LogType;
-import console.Logger;
-import helpers.*;
-import helpers.Point;
+import com.vpavlov.map.Path;
+import com.vpavlov.map.api.IOasisPathsGetter;
+import com.vpavlov.map.GraphEntity;
+import com.vpavlov.map.MapGraph;
+import com.vpavlov.simulation.events.DrinkPlace;
+import com.vpavlov.simulation.events.EventLogger;
+import com.vpavlov.simulation.exceptions.NoGoodsException;
+import com.vpavlov.console.ConsoleColor;
+import com.vpavlov.console.LogType;
+import com.vpavlov.console.Logger;
+import com.vpavlov.simulation.helpers.*;
+import com.vpavlov.map.Point;
 
 import java.util.*;
 import java.util.List;
@@ -53,7 +61,7 @@ public class Simulation {
     private final EventLogger eventLogger;
 
     /**
-     * File and console logger
+     * File and com.vpavlov.console logger
      */
     private final Logger logger;
 

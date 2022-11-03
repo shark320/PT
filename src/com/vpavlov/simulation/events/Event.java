@@ -1,4 +1,4 @@
-package model;
+package com.vpavlov.simulation.events;
 
 /**
  * Simulation event class

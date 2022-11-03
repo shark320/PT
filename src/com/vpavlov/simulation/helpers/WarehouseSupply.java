@@ -1,6 +1,6 @@
-package helpers;
+package com.vpavlov.simulation.helpers;
 
-import model.Warehouse;
+import com.vpavlov.simulation.model.Warehouse;
 
 /**
  * Record using for warehouses supply queue

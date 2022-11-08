@@ -9,7 +9,11 @@ import com.vpavlov.map.Point;
  */
 public class Oasis {
 
+    /**
+     * This oasis id
+     */
     private final int id;
+
     /**
      * Oasis location {x , y}
      */
@@ -18,8 +22,9 @@ public class Oasis {
     /**
      * Constructor
      *
-     * @param x - X-coordinate
-     * @param y - Y-coordinate
+     * @param id oasis id
+     * @param x  X-coordinate
+     * @param y  Y-coordinate
      */
     public Oasis(int id, double x, double y) {
         this.id = id;
@@ -37,6 +42,6 @@ public class Oasis {
 
     @Override
     public String toString() {
-        return "<OASIS ["+id+"]>[x=" + this.location.x() + ", y=" + this.location.y() + "]";
+        return "<OASIS [" + id + "]>[x=" + this.location.x() + ", y=" + this.location.y() + "]";
     }
 }

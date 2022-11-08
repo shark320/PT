@@ -28,6 +28,9 @@ public class Simulation {
      */
     private final List<Warehouse> warehouses = new ArrayList<>();
 
+    /**
+     * Queue of warehouse supplies by next supply time
+     */
     private final PriorityQueue<WarehouseSupply> warehouseSupplies = new PriorityQueue<>();
 
     /**
@@ -61,7 +64,7 @@ public class Simulation {
     private final EventLogger eventLogger;
 
     /**
-     * File and com.vpavlov.console logger
+     * File and console logger
      */
     private final Logger logger;
 
@@ -75,12 +78,17 @@ public class Simulation {
      */
     private final long startTime = System.currentTimeMillis();
 
+
+    /**
+     * Flag if simulation is crashed
+     */
     private boolean isCrashed = false;
 
     /**
      * Constructor
      *
-     * @param params -parameters of the simulation
+     * @param params parameters of the simulation
+     * @param logger logger
      */
     public Simulation(String[] params, Logger logger) {
         logger.log("Simulation building..", LogType.DEBUG);
@@ -504,6 +512,12 @@ public class Simulation {
         simulationEnd();
     }
 
+    /**
+     * Log info about simulation crash
+     *
+     * @param request     current request
+     * @param currentTime current simulation time
+     */
     private void simulationCrashed(Request request, double currentTime) {
         logger.log(
                 String.format(

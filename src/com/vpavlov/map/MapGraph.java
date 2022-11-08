@@ -102,7 +102,9 @@ public class MapGraph {
     /**
      * Constructor
      *
-     * @param points -graph vertexes
+     * @param points graph vertexes
+     * @param camelTypes simulation camel types
+     * @param warehouses list of warehouses
      */
     public MapGraph(List<Point> points, PriorityQueue<CamelType> camelTypes, List<Warehouse> warehouses) {
         graph = new ArrayList<>(points.size());

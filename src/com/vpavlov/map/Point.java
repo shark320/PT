@@ -12,15 +12,6 @@ package com.vpavlov.map;
 public record Point(double x, double y, int id) {
 
     /**
-     * Constructor
-     *
-     * @param x - X-coordinate
-     * @param y - Y-coordinate
-     */
-    public Point {
-    }
-
-    /**
      * Calculate distance between two points
      *
      * @param p1 - first point

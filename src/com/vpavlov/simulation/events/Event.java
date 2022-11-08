@@ -28,7 +28,7 @@ public class Event implements Comparable<Event> {
      * @param time      simulation event time
      * @param timestamp real world timestamp
      * @param message   event message
-     * @throws IllegalArgumentException if time < 0 or message is empty or null
+     * @throws IllegalArgumentException if time less than 0 or message is empty or null
      */
     public Event(double time, long timestamp, String message) throws IllegalArgumentException {
         if (time < 0) {

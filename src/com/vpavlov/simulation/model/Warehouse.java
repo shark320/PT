@@ -64,20 +64,41 @@ public class Warehouse implements Comparable<Warehouse> {
     /**
      * Constructor
      *
-     * @param x             - X-coordinate
-     * @param y             - Y-coordinate
-     * @param supplyAmount  - supply amount
-     * @param supplyTimeout - supply timeout
-     * @param loadingTime   - loading time
+     * @param id            warehouse id
+     * @param x             X-coordinate
+     * @param y             Y-coordinate
+     * @param supplyAmount  supply amount
+     * @param supplyTimeout supply timeout
+     * @param loadingTime   loading time
      */
     public Warehouse(int id, double x, double y, int supplyAmount, double supplyTimeout, double loadingTime) {
+        if (Double.compare(supplyTimeout, 0d) == 0) {
+            if (supplyAmount == 0) {
+                this.nextSupply = Double.POSITIVE_INFINITY;
+                this.goodsAmount = 0;
+            } else {
+                this.nextSupply = Double.POSITIVE_INFINITY;
+                this.goodsAmount = Integer.MAX_VALUE;
+            }
+
+        } else {
+            if (supplyAmount == 0) {
+                this.nextSupply = Double.POSITIVE_INFINITY;
+                this.goodsAmount = 0;
+            } else {
+                this.nextSupply = supplyTimeout;
+                this.goodsAmount = supplyAmount;
+            }
+        }
+
+
         this.id = id;
         this.location = new Point(x, y, id);
         this.supplyAmount = supplyAmount;
         this.supplyTimeout = supplyTimeout;
         this.loadingTime = loadingTime;
-        this.goodsAmount = supplyAmount;
-        this.nextSupply = supplyTimeout;
+
+
         setPriority();
     }
 
@@ -190,7 +211,11 @@ public class Warehouse implements Comparable<Warehouse> {
      * @return set of camels with specified camelType
      */
     public List<Camel> generateCamels(CamelType type, PriorityQueue<CamelType> types) {
-        double minProportion = types.stream().min(Comparator.comparingDouble(CamelType::getProportion)).get().getProportion();
+        Optional<CamelType> res = types.stream().min(Comparator.comparingDouble(CamelType::getProportion));
+        double minProportion = type.getProportion();
+        if (res.isPresent()) {
+            minProportion = res.get().getProportion();
+        }
         long amount = Math.round(1 / minProportion + 0.5) * MAGIC_NUMBER;
         Set<Camel> result = new HashSet<>();
 

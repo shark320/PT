@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 /**
- * Provides logging to the com.vpavlov.console and log file
+ * Provides logging to the console and log file
  *
  * @author vpavlov
  */
@@ -101,8 +101,9 @@ public class Logger {
 
     /**
      * Default constructor
-     * Creates new com.vpavlov.console and file to log into
+     * Creates new console and file to log into
      *
+     * @param useDefaultConsole default console flag. True - use default console, false - use custom console
      * @throws FileNotFoundException if there is error during file creation
      */
     public Logger(boolean useDefaultConsole) throws FileNotFoundException {
@@ -116,7 +117,7 @@ public class Logger {
      * Constructor
      *
      * @param file    file to log into
-     * @param console com.vpavlov.console to log into
+     * @param console console to log into
      * @throws FileNotFoundException if there is error during file opening
      */
     public Logger(File file, LogConsole console) throws FileNotFoundException {
@@ -138,7 +139,7 @@ public class Logger {
      * {
      * Constructor
      *
-     * @param console com.vpavlov.console to log into
+     * @param console console to log into
      */
     public Logger(LogConsole console) {
         this.console = console;
@@ -156,10 +157,10 @@ public class Logger {
     }
 
     /**
-     * Log to the com.vpavlov.console
+     * Log to the console
      *
      * @param message message to log
-     * @throws UnsupportedOperationException if com.vpavlov.console is not attached (null)
+     * @throws UnsupportedOperationException if console is not attached (null)
      */
     public void logToConsole(String message) throws UnsupportedOperationException {
         if (console != null) {
@@ -172,11 +173,11 @@ public class Logger {
     }
 
     /**
-     * Log to the com.vpavlov.console with specified logging tag
+     * Log to the console with specified logging tag
      *
      * @param message message to log
      * @param type    logging tag
-     * @throws UnsupportedOperationException if com.vpavlov.console is not attached (null)
+     * @throws UnsupportedOperationException if console is not attached (null)
      */
     public void logToConsole(String message, LogType type) throws UnsupportedOperationException {
         if (console == null) {
@@ -237,8 +238,8 @@ public class Logger {
     }
 
     /**
-     * Log message to the com.vpavlov.console and to the file at the same time (if there are connected) <br>
-     * If one of the outputs are not connected, then log is carried out only for onew
+     * Log message to the console and to the file at the same time (if there are connected) <br>
+     * If one of the outputs are not connected, then log is carried out only for one
      *
      * @param message message to log
      * @param logType logging tag
@@ -256,7 +257,7 @@ public class Logger {
     }
 
     /**
-     * Print line without '\n' symbol to the default com.vpavlov.console with specified color and color reset.
+     * Print line without '\n' symbol to the default console with specified color and color reset.
      *
      * @param message message to print
      * @param color   color to message print with
@@ -266,7 +267,7 @@ public class Logger {
     }
 
     /**
-     * Print line with '\n' symbol to the default com.vpavlov.console with specified color and color reset.
+     * Print line with '\n' symbol to the default console with specified color and color reset.
      *
      * @param message message to print
      * @param color   color to message print with
@@ -276,7 +277,7 @@ public class Logger {
     }
 
     /**
-     * Log a message to the default com.vpavlov.console
+     * Log a message to the default console
      *
      * @param message message to log
      * @param type    log tag
@@ -321,7 +322,7 @@ public class Logger {
     }
 
     /**
-     * Print timestamp to the default com.vpavlov.console
+     * Print timestamp to the default console
      */
     private void defaultConsoleTimestamp() {
         printToDefaultConsole(timestamp() + "\t", TIMESTAMP_CONSOLE_COLOR);

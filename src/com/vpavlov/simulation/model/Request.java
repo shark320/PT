@@ -85,6 +85,11 @@ public class Request implements Comparable<Request> {
         return oasisId;
     }
 
+    /**
+     * Goods count setter
+     *
+     * @param goodsCount goods count
+     */
     public void setGoodsCount(int goodsCount) {
         this.goodsCount = goodsCount;
     }

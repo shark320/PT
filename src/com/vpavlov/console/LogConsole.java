@@ -11,7 +11,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
 /**
- * Log com.vpavlov.console in a special window with multiply colors logs
+ * Log console in a special window with multiply colors logs
  *
  * @author vpavlov
  */
@@ -166,7 +166,7 @@ public class LogConsole {
     }
 
     /**
-     * Logs a timestamp to the com.vpavlov.console
+     * Logs a timestamp to the console
      *
      * @param timestamp timestamp to log
      */
@@ -175,7 +175,7 @@ public class LogConsole {
     }
 
     /**
-     * Log a message to the com.vpavlov.console
+     * Log a message to the console
      *
      * @param message message to log
      */
@@ -184,7 +184,7 @@ public class LogConsole {
     }
 
     /**
-     * Log a message to the com.vpavlov.console with specified color
+     * Log a message to the console with specified color
      *
      * @param message message to log
      * @param color   text color
@@ -213,7 +213,7 @@ public class LogConsole {
     }
 
     /**
-     * Set the com.vpavlov.console text color
+     * Set the console text color
      *
      * @param color color to set
      */
@@ -221,7 +221,6 @@ public class LogConsole {
         StyleContext sc = StyleContext.getDefaultStyleContext();
         AttributeSet aset;
         aset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, color);
-        //textArea.setCharacterAttributes(aset, false);
         return aset;
     }
 

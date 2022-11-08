@@ -48,12 +48,24 @@ public class CamelType implements Comparable<CamelType> {
      */
     private final double proportion;
 
+    /**
+     * Distance deviation for generation (Normal distribution)
+     */
     private final double distanceDeviation;
 
+    /**
+     * Distance mean (Normal distribution)
+     */
     private final double distanceMean;
 
+    /**
+     * Effective camel type distance according to normal distribution rules
+     */
     private final double effectiveDistance;
 
+    /**
+     * Camel type efficiency
+     */
     private final double efficiency;
 
     /**
@@ -80,11 +92,16 @@ public class CamelType implements Comparable<CamelType> {
         this.distanceDeviation = (maxDistance - minDistance) / 4;
         this.distanceMean = (maxDistance + minDistance) / 2;
         this.effectiveDistance = distanceMean + 2 * distanceDeviation;
-        this.efficiency=setEfficiency();
+        this.efficiency = setEfficiency();
     }
 
-    private double setEfficiency(){
-        return ((maxSpeed+minSpeed)/2)*effectiveDistance*maxLoad;
+    /**
+     * Count camel type efficiency (use average speed, effective distance and max load)
+     *
+     * @return camel type efficiency
+     */
+    private double setEfficiency() {
+        return ((maxSpeed + minSpeed) / 2) * effectiveDistance * maxLoad;
     }
 
     /**
@@ -150,10 +167,20 @@ public class CamelType implements Comparable<CamelType> {
         return effectiveDistance;
     }
 
+    /**
+     * Max camel type load getter
+     *
+     * @return max camel type load
+     */
     public int getMaxLoad() {
         return maxLoad;
     }
 
+    /**
+     * Camel type drink time getter
+     *
+     * @return camel type drink time
+     */
     public double getDrinkTime() {
         return drinkTime;
     }
@@ -173,7 +200,7 @@ public class CamelType implements Comparable<CamelType> {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof CamelType) {
-            return this.name.equals(((CamelType)obj).name);
+            return this.name.equals(((CamelType) obj).name);
         }
         return false;
     }

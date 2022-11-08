@@ -19,14 +19,14 @@ public class EventLogger {
     private final PriorityQueue<Event> events = new PriorityQueue<>();
 
     /**
-     * File and com.vpavlov.console logger
+     * File and console logger
      */
     private final Logger logger;
 
     /**
      * Constructor
      *
-     * @param logger file and com.vpavlov.console logger
+     * @param logger file and console logger
      */
     public EventLogger(Logger logger) {
         this.logger = logger;

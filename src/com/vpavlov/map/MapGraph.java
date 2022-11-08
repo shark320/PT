@@ -132,7 +132,7 @@ public class MapGraph {
      * @param oasisId oasis id
      * @return OasisPathsGetter for the specified oasis
      */
-    public OasisPathsGetter getPathsForOasis(int oasisId) {
+    public IOasisPathsGetter getPathsForOasis(int oasisId) {
         return new OasisPathsGetter(oasisId);
     }
 

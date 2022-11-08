@@ -242,6 +242,7 @@ public class Simulation {
      * @param goods   amount of goods in request
      * @param timeout time to process the request
      * @return path, fitting camel type and minimal possible speed to pass the path
+     * @throws NoGoodsException if there are not enough goods fot the request
      */
     private PathCamelType getFitCamelType(Path path, int goods, double timeout) throws NoGoodsException {
         //System.out.println("[DEBUG] getFitCamelType");
@@ -275,6 +276,7 @@ public class Simulation {
      * @param goods      goods to deliver
      * @param timeout    time for pass the path
      * @return fitting path, fitting camel type and minimal possible speed to pass the path
+     * @throws NoGoodsException if there are not enough goods fot the request
      */
     private PathCamelType getRequestFitCamelType(IOasisPathsGetter pathGetter, int goods, double timeout) throws NoGoodsException {
         //System.out.println("[DEBUG] getRequestFitCamelType");
@@ -332,6 +334,7 @@ public class Simulation {
      * @param start     start time
      * @param timeout   time for request processing
      * @return amount of goods that left in the request
+     * @throws NoGoodsException if there are not enough goods fot the request
      */
     private int computePathForCamel(PathCamel pathCamel, int goods, double start, double timeout) throws NoGoodsException {
         //System.out.println("[DEBUG] computePathForCamel");
@@ -365,6 +368,16 @@ public class Simulation {
         return prepareGoods;
     }
 
+    /**
+     * Calculate camel path between two points
+     *
+     * @param time    current path time
+     * @param startId path start point
+     * @param p1      first point
+     * @param p2      second point
+     * @param camel   camel on the path
+     * @return transition time
+     */
     private double pointsTransition(double time, int startId, Point p1, Point p2, Camel camel) {
         double transitionDistance = Point.getDistance(p1, p2);
         double drinkTime = camel.getType().getDrinkTime();
@@ -393,6 +406,7 @@ public class Simulation {
      *
      * @param request request to process
      * @return fitting path and camel
+     * @throws NoGoodsException if there are not enough goods fot the request
      */
     private PathCamel camelPrepare(Request request) throws NoGoodsException {
         //System.out.println("[DEBUG] camelPrepare");
@@ -429,6 +443,7 @@ public class Simulation {
      * @param request     request to process
      * @param currentTime current time
      * @return true if computing was success, else - false
+     * @throws NoGoodsException if there are not enough goods fot the request
      */
     private boolean computeRequest(Request request, double currentTime) throws NoGoodsException {
         //System.out.println("[DEBUG] computeRequest");

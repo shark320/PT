@@ -216,6 +216,7 @@ public class LogConsole {
      * Set the console text color
      *
      * @param color color to set
+     * @return colored attributes set
      */
     private AttributeSet setColor(Color color) {
         StyleContext sc = StyleContext.getDefaultStyleContext();

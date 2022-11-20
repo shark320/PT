@@ -21,6 +21,10 @@ public class Main {
      * @param args - program arguments
      */
     public static void main(String[] args){
+        if (args.length !=1){
+            System.err.println("Wrong number of arguments");
+            return;
+        }
         Locale.setDefault(Locale.US);
         Logger logger ;
         try {
@@ -31,7 +35,14 @@ public class Main {
         }
         logger.log(String.format("Available memory: %f MB",Runtime.getRuntime().freeMemory()/1e6), LogType.WARNING);
 
-        String[] res = Parser.parseFile(new File("minimal_example.txt"));
+        String path = args[0];
+        File file = new File(path);
+        if (!file.exists()){
+            System.err.println("File does not exist.");
+            return;
+        }
+
+        String[] res = Parser.parseFile(file);
 
         Simulation simulation = new Simulation(res, logger);
         simulation.simulate();
